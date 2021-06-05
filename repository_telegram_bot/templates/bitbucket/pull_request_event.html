@@ -1,0 +1,5 @@
+{% extends "bitbucket/base.html" %}
+{% block body %}
+<b>{{ actor_display_name }}</b> {{ action | upper }} pull request #{{ pull_request_id }}:
+<a href="{{ pull_request_href }}">{{ pull_request_title }}</a>
+{% endblock %}
