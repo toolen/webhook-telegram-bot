@@ -9,5 +9,9 @@ pre-commit:
 	poetry run pytest --cov=$(package_name) tests/
 	poetry run bandit -r $(package_name)
 	poetry run safety check
+	poetry run radon cc $(package_name)
+	poetry run radon mi $(package_name)
+	poetry run radon raw $(package_name)
+	poetry run radon hal $(package_name)
 test:
 	poetry run pytest --cov=$(package_name) tests/

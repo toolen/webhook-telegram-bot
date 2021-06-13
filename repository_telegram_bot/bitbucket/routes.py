@@ -1,7 +1,7 @@
 """This file contains routes of Bitbucket module."""
 from aiohttp import web
 
-from repository_telegram_bot.settings import DEBUG
+from repository_telegram_bot.helpers import get_config_value
 
 from .constants import BITBUCKET_WEBHOOK_ROUTE
 from .handlers import bitbucket_debug_template_handler, bitbucket_webhook_handler
@@ -23,7 +23,7 @@ def init_bitbucket_routes(app: web.Application) -> None:
             )
         ]
     )
-    if DEBUG:
+    if get_config_value(app, 'DEBUG'):
         app.add_routes(
             [
                 web.get(
