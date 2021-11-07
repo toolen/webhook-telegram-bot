@@ -2,16 +2,16 @@
 import logging
 from typing import Dict, Optional
 
-import aioredis
 from aiohttp import web
-from aioredis import Redis
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 from repository_telegram_bot.bitbucket.routes import init_bitbucket_routes
 from repository_telegram_bot.config import get_config
+from repository_telegram_bot.exceptions import DatabaseUnconfiguredException
 from repository_telegram_bot.helpers import (
     get_config_value,
     get_database,
+    get_db_wrapper_instance,
     get_telegram_api,
     set_config,
     set_database,
@@ -21,6 +21,8 @@ from repository_telegram_bot.helpers import (
 from repository_telegram_bot.telegram.constants import TELEGRAM_WEBHOOK_ROUTE
 from repository_telegram_bot.telegram.routes import init_telegram_routes
 from repository_telegram_bot.telegram.telegram_api import TelegramAPI
+
+logger = logging.getLogger(__name__)
 
 
 def init_config(
@@ -48,6 +50,7 @@ def init_logging(app: web.Application) -> None:
     """
     log_level = get_config_value(app, 'LOG_LEVEL')
     logging.basicConfig(level=log_level)
+    logger.debug(f'Logging configured with {log_level} level.')
 
 
 async def init_database(app: web.Application) -> None:
@@ -59,14 +62,17 @@ async def init_database(app: web.Application) -> None:
     """
 
     async def close_database(app_: web.Application) -> None:
-        pool = get_database(app_)
-        pool.close()
-        await pool.wait_closed()
+        db_ = get_database(app_)
+        db_.close()
 
-    redis_url = get_config_value(app, 'REDIS_URL')
-    redis_pool: Redis = await aioredis.create_redis_pool(redis_url, encoding="utf-8")
-    set_database(app, redis_pool)
-    app.on_cleanup.append(close_database)
+    database_url = get_config_value(app, 'DATABASE_URL')
+    database_engine = get_config_value(app, 'DATABASE_ENGINE')
+    if database_url and database_engine:
+        db = get_db_wrapper_instance(database_engine, database_url)
+        set_database(app, db)
+        app.on_cleanup.append(close_database)
+    else:
+        raise DatabaseUnconfiguredException()
 
 
 def init_templates(app: web.Application) -> None:

@@ -1,10 +1,13 @@
 """This file contains application helpers."""
+import importlib
 from typing import Any, Dict, Optional, cast
 
 from aiohttp import web
-from aioredis import Redis
 from jinja2 import Environment
 
+from repository_telegram_bot.database.backends.types import (
+    DatabaseWrapperImplementation,
+)
 from repository_telegram_bot.telegram.telegram_api import TelegramAPI
 
 CONFIG_KEY = 'CONFIG'
@@ -45,7 +48,7 @@ def get_config_value(app: web.Application, key: str) -> Optional[str]:
     return get_config(app).get(key)
 
 
-def set_database(app: web.Application, database: Redis) -> None:
+def set_database(app: web.Application, database: DatabaseWrapperImplementation) -> None:
     """
     Set database instance into application.
 
@@ -56,14 +59,14 @@ def set_database(app: web.Application, database: Redis) -> None:
     app[DATABASE_KEY] = database
 
 
-def get_database(app: web.Application) -> Redis:
+def get_database(app: web.Application) -> DatabaseWrapperImplementation:
     """
     Return database instance from application.
 
     :param app:
     :return:
     """
-    return app[DATABASE_KEY]
+    return cast(DatabaseWrapperImplementation, app[DATABASE_KEY])
 
 
 def set_telegram_api(app: web.Application, telegram_api: TelegramAPI) -> None:
@@ -106,3 +109,18 @@ def get_template_engine(app: web.Application) -> Environment:
     :return:
     """
     return cast(Environment, app[TEMPLATE_ENGINE_KEY])
+
+
+def get_db_wrapper_instance(
+    database_engine: str, database_url: str
+) -> DatabaseWrapperImplementation:
+    """
+    Return database wrapper instance, according configuration.
+
+    :param database_engine:
+    :param database_url:
+    :return:
+    """
+    module = importlib.import_module(database_engine)
+    db_wrapper_class = getattr(module, 'DatabaseWrapper')
+    return cast(DatabaseWrapperImplementation, db_wrapper_class(database_url))

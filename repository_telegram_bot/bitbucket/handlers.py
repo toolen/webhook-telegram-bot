@@ -7,6 +7,8 @@ from aiohttp import web
 from aiohttp.web_request import Request
 
 from repository_telegram_bot.bitbucket.services import BitbucketEventProcessor
+from repository_telegram_bot.database.exceptions import ChatNotFound
+from repository_telegram_bot.database.models import Chat
 from repository_telegram_bot.helpers import (
     get_database,
     get_telegram_api,
@@ -28,11 +30,10 @@ async def bitbucket_webhook_handler(request: Request) -> web.Response:
     if repository_id and event_key:
         app = request.app
         telegram_api = get_telegram_api(app)
-        redis_pool = get_database(app)
+        db = get_database(app)
         template_engine = get_template_engine(app)
 
         data = await request.json()
-
         logger.debug(f'{event_key}: {json.dumps(data)}')
 
         event_processor: BitbucketEventProcessor = BitbucketEventProcessor(
@@ -43,15 +44,17 @@ async def bitbucket_webhook_handler(request: Request) -> web.Response:
         template = template_engine.get_template(template_name)
         text = template.render(**context)
 
-        chat_id = int(await redis_pool.get(repository_id))
-
-        await telegram_api.send_message(
-            chat_id=chat_id,
-            text=text,
-            parse_mode='HTML',
-            disable_web_page_preview=True,
-            disable_notification=True,
-        )
+        try:
+            chat: Chat = await db.get_chat_by_repository_id(repository_id)
+            await telegram_api.send_message(
+                chat_id=chat.chat_id,
+                text=text,
+                parse_mode='HTML',
+                disable_web_page_preview=True,
+                disable_notification=True,
+            )
+        except ChatNotFound:
+            logger.error(f'Couldn\'t find chat by repository_id={repository_id}')
 
     return web.Response()
 

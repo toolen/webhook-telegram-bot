@@ -1,7 +1,7 @@
 """This file contains TelegramAPI class."""
 import json
 import logging
-from typing import Any, Dict, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Union, cast
 
 import aiohttp
 from aiohttp import web
@@ -27,6 +27,7 @@ class TelegramAPI:
         self.telegram_api_endpoint = telegram_api_endpoint
         self.token = token
         self.disable_notification = disable_notification
+        self.active = False
 
     async def command(self, command: str, payload: Dict[str, Any]) -> None:
         """
@@ -51,6 +52,7 @@ class TelegramAPI:
         :return:
         """
         await self.command('setWebhook', {'url': url_webhook})
+        self.active = True
 
     async def delete_webhook(self) -> None:
         """
@@ -59,6 +61,7 @@ class TelegramAPI:
         :return:
         """
         await self.command('setWebhook', {'url': ''})
+        self.active = False
 
     async def send_message(self, **kwargs: Union[str, int, bool]) -> None:
         """
@@ -72,7 +75,11 @@ class TelegramAPI:
         await self.command('sendMessage', kwargs)
 
     @staticmethod
-    def send_message_as_response(**kwargs: Union[str, int, bool]) -> web.Response:
+    def send_message_as_response(
+        **kwargs: Union[
+            str, int, bool, Dict[str, str], Dict[str, List[List[Dict[str, str]]]]
+        ]
+    ) -> web.Response:
         """
         Send text message as response.
 
@@ -89,7 +96,9 @@ class TelegramAPI:
         :param data:
         :return:
         """
-        return cast(str, deep_get(data, 'message.text'))
+        return cast(
+            str, deep_get(data, 'message.text') or deep_get(data, 'callback_query.data')
+        )
 
     @staticmethod
     def get_chat_id(data: Dict[str, Any]) -> Optional[int]:
@@ -99,4 +108,7 @@ class TelegramAPI:
         :param data:
         :return:
         """
-        return cast(int, deep_get(data, 'message.chat.id'))
+        chat_id = deep_get(data, 'message.chat.id') or deep_get(
+            data, 'callback_query.message.chat.id'
+        )
+        return cast(int, chat_id)

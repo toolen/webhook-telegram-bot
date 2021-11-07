@@ -1,4 +1,5 @@
 {% extends "bitbucket/base.html" %}
 {% block body %}
-{{ actor_display_name }} <b>created</b> new branch <a href="{{ branch_href }}">{{ branch_name }}</a>
+<b>{{ actor_display_name }}</b> CREATED new branch:
+<a href="{{ branch_href }}">{{ branch_name }}</a>
 {% endblock %}

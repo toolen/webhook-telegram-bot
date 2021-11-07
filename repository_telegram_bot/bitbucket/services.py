@@ -1,5 +1,5 @@
 """This file contains service classes."""
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, Tuple, Union, cast
 
 from first import first
@@ -7,7 +7,7 @@ from first import first
 from repository_telegram_bot.utils import deep_get
 
 
-class EventProcessor:
+class EventProcessor(ABC):
     """This base class for event processors."""
 
     entity: str

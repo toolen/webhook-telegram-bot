@@ -1,4 +1,7 @@
 package_name = repository_telegram_bot
+repository = toolen/repository-telegram-bot
+version = $(shell poetry version -s)
+tag = $(repository):$(version)
 
 pre-commit:
 	poetry run black .
@@ -13,5 +16,17 @@ pre-commit:
 	poetry run radon mi $(package_name)
 	poetry run radon raw $(package_name)
 	poetry run radon hal $(package_name)
+pydocstyle:
+	poetry run pydocstyle --add-ignore=D104 $(package_name)/
 test:
 	poetry run pytest --cov=$(package_name) tests/
+image:
+	docker build -t $(tag) .
+size:
+	docker images | grep $(repository) | grep $(version)
+scan:
+	trivy image $(tag)
+push:
+	docker trust sign $(tag)
+ngrok:
+	ngrok http 8080
