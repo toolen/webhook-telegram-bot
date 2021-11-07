@@ -58,3 +58,9 @@ jobs:
 
       - name: Run saftey
         run: poetry run safety check
+
+    services:
+      mongo:
+        image: mongo:4.4.9
+        ports:
+          - 27017:27017
