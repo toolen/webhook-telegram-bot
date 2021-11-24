@@ -1,0 +1,4 @@
+{% extends "bitbucket/base.html" %}
+{% block body %}
+{% if pipeline_state == 'FINISHED' %}🟢 {% endif %}{% if pipeline_state == 'FAILED' %}🔴 {% endif %}<a href="{{ pipeline_href }}">{{ pipeline_title }}</a> {{ pipeline_state }}
+{% endblock %}

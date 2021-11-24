@@ -32,6 +32,15 @@ class EventProcessor(ABC):
         """
         return cast(str, deep_get(self.json_data, 'repository.name'))
 
+    @property
+    def repository_href(self) -> Optional[str]:
+        """
+        Return repository href.
+
+        :return:
+        """
+        return cast(str, deep_get(self.json_data, 'repository.links.html.href'))
+
     @abstractmethod
     def get_template_name_with_context(
         self,
@@ -106,14 +115,49 @@ class RepositoryEventProcessor(EventProcessor):
         return cast(bool, deep_get(self.changes, 'closed'))
 
     @property
-    def number_of_commits(self) -> int:
+    def pipeline_title(self) -> Optional[str]:
         """
-        Return number of commits from changes.
+        Return pipeline title.
+
+        :return:
+        """
+        return cast(str, deep_get(self.json_data, 'commit_status.name'))
+
+    @property
+    def pipeline_state(self) -> Optional[str]:
+        """
+        Return pipeline state.
+
+        :return:
+        """
+        state = cast(str, deep_get(self.json_data, 'commit_status.state'))
+        if state == 'INPROGRESS':
+            return 'STARTED'
+        elif state == 'SUCCESSFUL':
+            return 'FINISHED'
+        else:
+            return state
+
+    @property
+    def pipeline_href(self) -> Optional[str]:
+        """
+        Return href to pipeline.
+
+        :return:
+        """
+        return cast(str, deep_get(self.json_data, 'commit_status.url'))
+
+    @property
+    def number_of_commits(self) -> Tuple[int, bool]:
+        """
+        Return a tuple of number of commits and bool determines whether there were more than 5 commits.
 
         :return:
         """
         changes = self.changes or {}
-        return len(changes.get('commits', []))
+        return len(changes.get('commits', [])), cast(
+            bool, deep_get(self.changes, 'truncated')
+        )
 
     def get_commit_description(self, commit: Dict[str, Any]) -> Optional[str]:
         """
@@ -140,13 +184,18 @@ class RepositoryEventProcessor(EventProcessor):
 
         :return:
         """
+        number_of_commits, is_number_of_commits_truncated = self.number_of_commits
         return {
             'repository_name': self.repository_name,
             'actor_display_name': self.actor_display_name,
             'action': self.action,
-            'number_of_commits': self.number_of_commits,
+            'number_of_commits': number_of_commits,
+            'is_number_of_commits_truncated': is_number_of_commits_truncated,
             'branch_name': self.branch_name,
             'branch_href': self.branch_href,
+            'pipeline_title': self.pipeline_title,
+            'pipeline_state': self.pipeline_state,
+            'pipeline_href': self.pipeline_href,
         }
 
     def get_template_name_with_context(
@@ -164,10 +213,13 @@ class RepositoryEventProcessor(EventProcessor):
                 template_name = 'bitbucket/branch_created.html'
             if self.is_closed:
                 template_name = 'bitbucket/branch_closed.html'
-            return template_name, context
+        elif self.action in ('commit_status_created', 'commit_status_updated'):
+            template_name = 'bitbucket/pipeline_event.html'
         else:
             context['event'] = f'{self.entity}:{self.action}'
-            return 'bitbucket/unknown_event.html', context
+            context['webhook_settings_href'] = f'{self.repository_href}/admin/webhooks'
+            template_name = 'bitbucket/unknown_event.html'
+        return template_name, context
 
 
 class PullRequestEventProcessor(EventProcessor):

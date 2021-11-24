@@ -1,5 +1,5 @@
 {% extends "bitbucket/base.html" %}
 {% block body %}
-<b>{{ actor_display_name }}</b> PUSHED {{ number_of_commits }} commit{% if number_of_commits > 1 %}s{% endif %} into branch:
+<b>{{ actor_display_name }}</b> PUSHED {% if is_number_of_commits_truncated %}more than {% endif %}{{ number_of_commits }} commit{% if number_of_commits > 1 %}s{% endif %} into branch:
 <a href="{{ branch_href }}">{{ branch_name }}</a>
 {% endblock %}

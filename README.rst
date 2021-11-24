@@ -14,7 +14,8 @@ Bitbucket
 
 Repository events:
  - repo:push
- - repo:updated
+ - repo:commit_comment_created
+ - repo:commit_status_updated
 
 Pull request events:
  - pullrequest:created
