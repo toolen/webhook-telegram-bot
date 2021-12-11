@@ -6,7 +6,7 @@ from bson import ObjectId
 from pydantic import BaseModel, Field
 
 
-class PydanticObjectId(ObjectId):
+class PydanticObjectId(ObjectId):  # type: ignore
     """This class provide pydantic compatible representation of ObjectId."""
 
     @classmethod
@@ -33,10 +33,10 @@ class PydanticObjectId(ObjectId):
         return value
 
 
-class ServiceEnum(str, Enum):
+class Service(str, Enum):
     """This enum represents services that repository can relate to."""
 
-    bitbucket = 'bitbucket'
+    BITBUCKET = 'bitbucket'
     # github = 'github'
     # gitlab = 'gitlab'
 
@@ -45,7 +45,7 @@ class Repository(BaseModel):
     """This class represents repository object."""
 
     repository_id: str
-    service: ServiceEnum
+    service: Service
     name: Optional[str]
 
     def __hash__(self) -> int:
@@ -70,6 +70,41 @@ class Chat(BaseModel):
         """Configuration of chat model."""
 
         allow_population_by_field_name = True
+
+    def get_repository_by_id(self, repository_id: str) -> Optional[Repository]:
+        """
+        Return Repository object by repository_id.
+
+        :param repository_id:
+        :return:
+        """
+        for repository in self.repositories:
+            if repository.repository_id == repository_id:
+                return repository
+        return None
+
+    def set_repository_name(self, repository_id: str, name: str) -> None:
+        """
+        Set repository name.
+
+        :param repository_id:
+        :param name:
+        :return:
+        """
+        for repository in self.repositories:
+            if repository.repository_id == repository_id:
+                repository.name = name
+
+    def delete_repository_by_id(self, repository_id: str) -> None:
+        """
+        Exclude repository from repositories list by id.
+
+        :param repository_id:
+        :return:
+        """
+        self.repositories = list(
+            filter(lambda x: x.repository_id != repository_id, self.repositories)
+        )
 
     # def dict(self, *args, **kwargs):
     #     """

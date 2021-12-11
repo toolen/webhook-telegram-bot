@@ -1,8 +1,8 @@
 """This file contains Telegram routes."""
 from aiohttp import web
 
-from .constants import TELEGRAM_WEBHOOK_ROUTE
-from .handlers import telegram_request_handler
+from repository_telegram_bot.telegram.constants import TELEGRAM_WEBHOOK_ROUTE
+from repository_telegram_bot.telegram.handlers import telegram_request_handler
 
 
 def init_telegram_routes(app: web.Application) -> None:

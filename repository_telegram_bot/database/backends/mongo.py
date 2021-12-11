@@ -38,26 +38,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """Drop database."""
         await self.client.drop_database(self.db.name)
 
-    # async def get_or_create_chat(self, chat: Chat) -> Tuple[Chat, bool]:
-    #     created = False
-    #     document_filter = {'chat_id': chat.chat_id}
-    #     collection: AsyncIOMotorCollection = self.get_collection('chats')
-    #     document: Optional[Dict] = await collection.find_one(document_filter)
-    #     repository_as_dict = first(chat.repositories).dict()
-    #     if document:
-    #         if not document['repositories']:
-    #             document['repositories'] = []
-    #         document['repositories'].append(repository_as_dict)
-    #         await collection.update_one(document_filter, document)
-    #     else:
-    #         chat_as_dict = chat.dict()
-    #         insert_one_result: InsertOneResult = await collection.insert_one(chat_as_dict)
-    #         chat_as_dict.update({'_id': insert_one_result.inserted_id})
-    #         document = chat_as_dict
-    #         created = True
-    #     chat = Chat.parse_obj(document)
-    #     return chat, created
-
     async def get_chat_by_chat_id(self, chat_id: int) -> Chat:
         """Return chat object by id."""
         document_filter = {'chat_id': chat_id}
@@ -86,21 +66,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         chat_as_dict = chat.dict()
         if chat.id:
             del chat_as_dict['id']
-            await collection.update_one({'chat_id': chat.chat_id}, chat_as_dict)
+            await collection.update_one(
+                {'chat_id': chat.chat_id}, {'$set': chat_as_dict}, upsert=True
+            )
         else:
             insert_one_result: InsertOneResult = await collection.insert_one(
                 chat_as_dict
             )
             chat.id = insert_one_result.inserted_id
         return chat
-
-    # async def save_chat(self, chat: Chat) -> Chat:
-    #     collection: AsyncIOMotorCollection = self.get_collection('chats')
-    #     document = chat.dict()
-    #     _id = document.get('_id')
-    #     if _id:
-    #         result: UpdateResult = await collection.replace_one({'_id': _id}, document)
-    #     else:
-    #         result: InsertOneResult = await collection.insert_one(document)
-    #         chat.id = result.inserted_id
-    #     return chat

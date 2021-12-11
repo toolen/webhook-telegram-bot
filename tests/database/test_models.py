@@ -4,13 +4,13 @@ from uuid import uuid4
 from bson import ObjectId
 from first import first
 
-from repository_telegram_bot.database.models import Chat, Repository, ServiceEnum
+from repository_telegram_bot.database.models import Chat, Repository, Service
 
 
 def test_create_chat_model_with_repository():
     repository_id = uuid4().hex
     chat_id = 1
-    repository = Repository(repository_id=repository_id, service=ServiceEnum.bitbucket)
+    repository = Repository(repository_id=repository_id, service=Service.BITBUCKET)
     chat = Chat(chat_id=chat_id, repositories=[repository])
     assert isinstance(chat, Chat)
     assert chat.id is None
@@ -24,7 +24,7 @@ def test_create_chat_model_with_repository():
 def test_serialize_chat_model_with_repository_to_dict():
     repository_id = uuid4().hex
     chat_id = 1
-    repository = Repository(repository_id=repository_id, service=ServiceEnum.bitbucket)
+    repository = Repository(repository_id=repository_id, service=Service.BITBUCKET)
     chat = Chat(chat_id=chat_id, repositories=[repository])
 
     chat_dict = chat.dict()
@@ -41,7 +41,7 @@ def test_serialize_chat_model_with_repository_to_dict():
 def test_serialize_chat_model_with_repository_to_json():
     repository_id = uuid4().hex
     chat_id = 1
-    repository = Repository(repository_id=repository_id, service=ServiceEnum.bitbucket)
+    repository = Repository(repository_id=repository_id, service=Service.BITBUCKET)
     chat = Chat(chat_id=chat_id, repositories=[repository])
 
     chat_json = chat.json()
@@ -58,7 +58,7 @@ def test_serialize_chat_model_with_repository_to_json():
 def test_deserialize_chat_model_with_repository_from_mongo_dict():
     repository_id = uuid4().hex
     chat_id = 1
-    repository = Repository(repository_id=repository_id, service=ServiceEnum.bitbucket)
+    repository = Repository(repository_id=repository_id, service=Service.BITBUCKET)
     chat = Chat(chat_id=chat_id, repositories=[repository])
 
     chat_dict = chat.dict()
@@ -78,7 +78,7 @@ def test_deserialize_chat_model_with_repository_from_mongo_dict():
 def test_deserialize_chat_model_with_repository_from_rdb_dict():
     repository_id = uuid4().hex
     chat_id = 1
-    repository = Repository(repository_id=repository_id, service=ServiceEnum.bitbucket)
+    repository = Repository(repository_id=repository_id, service=Service.BITBUCKET)
     chat = Chat(chat_id=chat_id, repositories=[repository])
 
     chat_dict = chat.dict()

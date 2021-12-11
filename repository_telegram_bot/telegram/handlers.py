@@ -1,21 +1,33 @@
 """This file contains Telegram handlers."""
 import json
 import logging
-import uuid
 from typing import Optional
 
 from aiohttp import web
 from aiohttp.web_request import Request
 
-from repository_telegram_bot.bitbucket.constants import BITBUCKET_WEBHOOK_ROUTE
-from repository_telegram_bot.database.exceptions import ChatNotFound
-from repository_telegram_bot.database.models import Chat, Repository, ServiceEnum
 from repository_telegram_bot.helpers import (
-    get_config_value,
     get_database,
     get_telegram_api,
     get_template_engine,
 )
+from repository_telegram_bot.telegram.commands import Command
+from repository_telegram_bot.telegram.commands.add_bitbucket_repository import (
+    add_bitbucket_repository_command_handler,
+)
+from repository_telegram_bot.telegram.commands.add_repository import (
+    add_repository_command_handler,
+)
+from repository_telegram_bot.telegram.commands.delete_repository import (
+    delete_repository_command_handler,
+)
+from repository_telegram_bot.telegram.commands.edit_repositories import (
+    edit_repositories_command_handler,
+)
+from repository_telegram_bot.telegram.commands.edit_repository import (
+    edit_repository_command_handler,
+)
+from repository_telegram_bot.telegram.commands.start import start_command_handler
 
 logger = logging.getLogger(__name__)
 
@@ -42,57 +54,34 @@ async def telegram_request_handler(request: Request) -> web.Response:
     if not text or not chat_id:
         raise Exception()
 
-    if text == '/start':
-        template = template_engine.get_template('start.html')
-        text = template.render()
-        return telegram_api.send_message_as_response(
-            chat_id=chat_id,
-            text=text,
-            parse_mode='HTML',
-            disable_notification=True,
-            reply_markup={
-                'inline_keyboard': [
-                    [{'text': '➕ Add Repository', 'callback_data': '/add_repository'}]
-                ]
-            },
+    if text == Command.START:
+        return await start_command_handler(chat_id, db, telegram_api, template_engine)
+
+    elif text == Command.ADD_REPOSITORY:
+        return await add_repository_command_handler(
+            chat_id, telegram_api, template_engine
         )
 
-    elif text == '/add_repository':
-        template = template_engine.get_template('select_service.html')
-        text = template.render()
-        return telegram_api.send_message_as_response(
-            chat_id=chat_id,
-            text=text,
-            parse_mode='HTML',
-            disable_notification=True,
-            reply_markup={
-                'inline_keyboard': [
-                    [{'text': 'Bitbucket', 'callback_data': '/bitbucket'}]
-                ]
-            },
+    elif text == Command.ADD_BITBUCKET_REPOSITORY:
+        return await add_bitbucket_repository_command_handler(
+            app, chat_id, db, telegram_api, template_engine
         )
 
-    elif text == '/bitbucket':
-        telegram_webhook_host = get_config_value(app, 'TELEGRAM_WEBHOOK_HOST')
-        repository_id: str = uuid.uuid4().hex
-        repository: Repository = Repository(
-            repository_id=repository_id, service=ServiceEnum.bitbucket
+    elif text == Command.EDIT_REPOSITORIES:
+        return await edit_repositories_command_handler(
+            chat_id, db, telegram_api, template_engine
         )
 
-        try:
-            chat = await db.get_chat_by_chat_id(chat_id)
-            chat.repositories.append(repository)
-            await db.save_chat(chat)
-        except ChatNotFound:
-            chat = Chat(chat_id=chat_id, repositories=[repository])
-            await db.save_chat(chat)
-
-        template = template_engine.get_template('bitbucket/start.html')
-        text = template.render(
-            webhook_url=f'{telegram_webhook_host}{BITBUCKET_WEBHOOK_ROUTE}/{repository_id}'
+    elif text.startswith(Command.EDIT_REPOSITORY):
+        repository_id = text.split('_').pop()
+        return await edit_repository_command_handler(
+            chat_id, repository_id, telegram_api, template_engine
         )
-        return telegram_api.send_message_as_response(
-            chat_id=chat_id, text=text, parse_mode='HTML', disable_notification=True
+
+    elif text.startswith(Command.DELETE_REPOSITORY):
+        repository_id = text.split('_').pop()
+        return await delete_repository_command_handler(
+            chat_id, repository_id, db, telegram_api, template_engine
         )
 
     else:

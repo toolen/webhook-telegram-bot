@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorCollection
 
 from repository_telegram_bot.database.backends.mongo import DatabaseWrapper
 from repository_telegram_bot.database.exceptions import ChatNotFound
-from repository_telegram_bot.database.models import Chat, Repository, ServiceEnum
+from repository_telegram_bot.database.models import Chat, Repository, Service
 
 
 async def test_get_chat_by_chat_id(db_wrapper: DatabaseWrapper):
@@ -35,7 +35,7 @@ async def test_get_chat_by_repository_id(db_wrapper: DatabaseWrapper):
         {
             'chat_id': chat_id,
             'repositories': [
-                {'repository_id': repository_id, 'service': ServiceEnum.bitbucket}
+                {'repository_id': repository_id, 'service': Service.BITBUCKET}
             ],
         }
     )
@@ -48,7 +48,7 @@ async def test_get_chat_by_repository_id(db_wrapper: DatabaseWrapper):
 
 async def test_save_chat(db_wrapper: DatabaseWrapper):
     repository_id = uuid4().hex
-    repository = Repository(repository_id=repository_id, service=ServiceEnum.bitbucket)
+    repository = Repository(repository_id=repository_id, service=Service.BITBUCKET)
     chat_id = 1
     chat = Chat(chat_id=chat_id, repositories=[repository])
 

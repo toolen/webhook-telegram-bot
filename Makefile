@@ -7,19 +7,22 @@ pre-commit:
 	poetry run black .
 	poetry run isort .
 	poetry run flake8 --ignore E501 $(package_name)/ tests/
-	poetry run mypy $(package_name)
-	poetry run pydocstyle --add-ignore=D104 $(package_name)/
+	make mypy
+	make pydocstyle
 	poetry run pytest --cov=$(package_name) tests/
 	poetry run bandit -r $(package_name)
 	poetry run safety check
-	poetry run radon cc $(package_name)
-	poetry run radon mi $(package_name)
-	poetry run radon raw $(package_name)
-	poetry run radon hal $(package_name)
+	make radon
+mypy:
+	poetry run mypy --strict --no-warn-return-any $(package_name)
 pydocstyle:
 	poetry run pydocstyle --add-ignore=D104 $(package_name)/
 test:
 	poetry run pytest --cov=$(package_name) tests/
+radon:
+	poetry run radon cc --min C --show-complexity $(package_name)
+	poetry run radon mi --min B $(package_name)
+	poetry run radon raw --summary $(package_name) | tail -n12
 image:
 	docker build -t $(tag) .
 size:

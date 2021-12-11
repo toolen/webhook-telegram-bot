@@ -1,19 +1,20 @@
-"""This file contains bitbucket request handlers."""
+"""This file contains Bitbucket request handlers."""
 import json
 import logging
-from typing import Optional
+from typing import Optional, cast
 
 from aiohttp import web
 from aiohttp.web_request import Request
 
 from repository_telegram_bot.bitbucket.services import BitbucketEventProcessor
 from repository_telegram_bot.database.exceptions import ChatNotFound
-from repository_telegram_bot.database.models import Chat
+from repository_telegram_bot.database.models import Chat, Repository
 from repository_telegram_bot.helpers import (
     get_database,
     get_telegram_api,
     get_template_engine,
 )
+from repository_telegram_bot.utils import deep_get
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,13 @@ async def bitbucket_webhook_handler(request: Request) -> web.Response:
 
         try:
             chat: Chat = await db.get_chat_by_repository_id(repository_id)
+            repository: Optional[Repository] = chat.get_repository_by_id(repository_id)
+            if repository and not repository.name:
+                # TODO rewrite
+                repository_name = cast(str, deep_get(data, 'repository.name'))
+                chat.set_repository_name(repository.repository_id, repository_name)
+                await db.save_chat(chat)
+
             await telegram_api.send_message(
                 chat_id=chat.chat_id,
                 text=text,

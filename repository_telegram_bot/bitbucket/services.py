@@ -318,7 +318,7 @@ class UnknownEventProcessor(EventProcessor):
 
 
 class BitbucketEventProcessor:
-    """This class process json from bitbucket hook."""
+    """This class process json from Bitbucket hook."""
 
     def __init__(self, event_key: str, json_data: Dict[str, Any]) -> None:
         """
