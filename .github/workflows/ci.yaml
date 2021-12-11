@@ -35,29 +35,8 @@ jobs:
         run: poetry install
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
 
-      - name: Run black
-        run: poetry run black . --check
-
-      - name: Run isort
-        run: poetry run isort . --check-only
-
-      - name: Run flake8
-        run: poetry run flake8 --ignore E501 repository_telegram_bot/ tests/
-
-      - name: Run mypy
-        run: poetry run mypy repository_telegram_bot
-
-      - name: Run pydocstyle
-        run: poetry run pydocstyle --add-ignore=D104 repository_telegram_bot/
-
-      - name: Test with pytest
-        run: poetry run pytest --cov=repository_telegram_bot tests/
-
-      - name: Run bandit
-        run: poetry run bandit -r repository_telegram_bot
-
-      - name: Run saftey
-        run: poetry run safety check
+      - name: Run make
+        run: make pre-commit
 
     services:
       mongo:
