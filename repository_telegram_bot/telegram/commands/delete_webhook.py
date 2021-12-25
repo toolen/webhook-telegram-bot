@@ -1,4 +1,4 @@
-"""This file contains functions to handle /edit_repositories command."""
+"""This file contains functions to handle /delete_repository command."""
 from aiohttp import web
 from jinja2 import Environment
 
@@ -6,58 +6,53 @@ from repository_telegram_bot.database.backends.types import (
     DatabaseWrapperImplementation,
 )
 from repository_telegram_bot.database.exceptions import ChatNotFound
+from repository_telegram_bot.database.models import Chat
 from repository_telegram_bot.telegram.commands import Command
 from repository_telegram_bot.telegram.telegram_api import TelegramAPI
 
 
-async def edit_repositories_command_handler(
+async def delete_webhook_command_handler(
     chat_id: int,
+    webhook_id: str,
     db: DatabaseWrapperImplementation,
     telegram_api: TelegramAPI,
     template_engine: Environment,
 ) -> web.Response:
     """
-    Return list of repositories associated with the chat.
+    Return message about repository deletion.
 
     :param chat_id:
+    :param webhook_id:
     :param db:
     :param telegram_api:
     :param template_engine:
     :return:
     """
     try:
-        template = template_engine.get_template('edit_repositories.html')
-        text = template.render()
+        chat: Chat = await db.get_chat_by_chat_id(chat_id)
+        chat.delete_webhook_by_id(webhook_id)
+        await db.save_chat(chat)
 
-        chat = await db.get_chat_by_chat_id(chat_id)
-        inline_keyboard = []
-        for repository in chat.repositories:
-            repository_name = repository.name or repository.repository_id
-            inline_keyboard.append(
-                [
-                    {
-                        'text': f'{repository.service}: {repository_name}',
-                        'callback_data': f'{Command.EDIT_REPOSITORY}_{repository.repository_id}',
-                    }
-                ]
-            )
-        inline_keyboard.append(
+        template = template_engine.get_template('repository_deleted.html')
+        text = template.render()
+        inline_keyboard = [
             [
                 {
                     'text': '🔙 Back',
-                    'callback_data': Command.START,
+                    'callback_data': Command.EDIT_WEBHOOKS
+                    if len(chat.webhooks)
+                    else Command.START,
                 }
             ]
-        )
-
+        ]
     except ChatNotFound:
         template = template_engine.get_template('chat_not_found.html')
         text = template.render()
         inline_keyboard = [
             [
                 {
-                    'text': '➕ Add Repository',
-                    'callback_data': Command.ADD_REPOSITORY,
+                    'text': '➕ Add Webhook',
+                    'callback_data': Command.ADD_WEBHOOK,
                 }
             ]
         ]

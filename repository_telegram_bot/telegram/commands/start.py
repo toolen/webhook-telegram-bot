@@ -31,20 +31,20 @@ async def start_command_handler(
     inline_keyboard = [
         [
             {
-                'text': '➕ Add Repository',
-                'callback_data': Command.ADD_REPOSITORY,
+                'text': '➕ Add Webhook',
+                'callback_data': Command.ADD_WEBHOOK,
             }
         ]
     ]
 
     try:
         chat: Chat = await db.get_chat_by_chat_id(chat_id)
-        if len(chat.repositories):
+        if len(chat.webhooks):
             inline_keyboard.append(
                 [
                     {
-                        'text': '✏ Edit Repositories',
-                        'callback_data': Command.EDIT_REPOSITORIES,
+                        'text': '✏ Edit Webhooks',
+                        'callback_data': Command.EDIT_WEBHOOKS,
                     }
                 ]
             )

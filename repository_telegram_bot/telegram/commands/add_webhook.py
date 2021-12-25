@@ -6,7 +6,7 @@ from repository_telegram_bot.telegram.commands import Command
 from repository_telegram_bot.telegram.telegram_api import TelegramAPI
 
 
-async def add_repository_command_handler(
+async def add_webhook_command_handler(
     chat_id: int, telegram_api: TelegramAPI, template_engine: Environment
 ) -> web.Response:
     """
@@ -29,7 +29,7 @@ async def add_repository_command_handler(
                 [
                     {
                         'text': 'Bitbucket',
-                        'callback_data': Command.ADD_BITBUCKET_REPOSITORY,
+                        'callback_data': Command.ADD_BITBUCKET_WEBHOOK,
                     }
                 ],
                 [

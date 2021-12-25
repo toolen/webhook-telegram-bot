@@ -8,7 +8,7 @@ from aiohttp.web_request import Request
 
 from repository_telegram_bot.bitbucket.services import BitbucketEventProcessor
 from repository_telegram_bot.database.exceptions import ChatNotFound
-from repository_telegram_bot.database.models import Chat, Repository
+from repository_telegram_bot.database.models import Chat, Webhook
 from repository_telegram_bot.helpers import (
     get_database,
     get_telegram_api,
@@ -26,9 +26,9 @@ async def bitbucket_webhook_handler(request: Request) -> web.Response:
     :param request:
     :return:
     """
-    repository_id = request.match_info.get('repository_id')
+    webhook_id = request.match_info.get('webhook_id')
     event_key: Optional[str] = request.headers.get('X-Event-Key')
-    if repository_id and event_key:
+    if webhook_id and event_key:
         app = request.app
         telegram_api = get_telegram_api(app)
         db = get_database(app)
@@ -46,12 +46,14 @@ async def bitbucket_webhook_handler(request: Request) -> web.Response:
         text = template.render(**context)
 
         try:
-            chat: Chat = await db.get_chat_by_repository_id(repository_id)
-            repository: Optional[Repository] = chat.get_repository_by_id(repository_id)
-            if repository and not repository.name:
+            chat: Chat = await db.get_chat_by_webhook_id(webhook_id)
+            webhook: Optional[Webhook] = chat.get_webhook_by_id(webhook_id)
+            if webhook and not webhook.repository_name:
                 # TODO rewrite
-                repository_name = cast(str, deep_get(data, 'repository.name'))
-                chat.set_repository_name(repository.repository_id, repository_name)
+                repository_name = cast(
+                    str, deep_get(data, 'repository.repository_name')
+                )
+                chat.set_webhook_repository_name(webhook.webhook_id, repository_name)
                 await db.save_chat(chat)
 
             await telegram_api.send_message(
@@ -62,7 +64,7 @@ async def bitbucket_webhook_handler(request: Request) -> web.Response:
                 disable_notification=True,
             )
         except ChatNotFound:
-            logger.error(f'Couldn\'t find chat by repository_id={repository_id}')
+            logger.error(f'Couldn\'t find chat by webhook_id={webhook_id}')
 
     return web.Response()
 

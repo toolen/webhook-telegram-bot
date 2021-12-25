@@ -1,4 +1,6 @@
 """This file contains independent database models."""
+from __future__ import annotations
+
 from enum import Enum
 from typing import Any, Callable, Generator, List, Optional, Type, Union
 
@@ -11,7 +13,7 @@ class PydanticObjectId(ObjectId):  # type: ignore
 
     @classmethod
     def __get_validators__(
-        cls: Type['PydanticObjectId'],
+        cls: Type[PydanticObjectId],
     ) -> Generator[Callable[[Any], Any], None, None]:
         """
         Return validators.
@@ -21,7 +23,7 @@ class PydanticObjectId(ObjectId):  # type: ignore
         yield cls.validate
 
     @classmethod
-    def validate(cls: Type['PydanticObjectId'], value: Any) -> Any:
+    def validate(cls: Type[PydanticObjectId], value: Any) -> Any:
         """
         Validate object.
 
@@ -34,29 +36,29 @@ class PydanticObjectId(ObjectId):  # type: ignore
 
 
 class Service(str, Enum):
-    """This enum represents services that repository can relate to."""
+    """This enum represents services that webhook can relate to."""
 
     BITBUCKET = 'bitbucket'
     # github = 'github'
     # gitlab = 'gitlab'
 
 
-class Repository(BaseModel):
-    """This class represents repository object."""
+class Webhook(BaseModel):
+    """This class represents webhook object."""
 
-    repository_id: str
+    webhook_id: str
     service: Service
-    name: Optional[str]
+    repository_name: Optional[str]
 
     def __hash__(self) -> int:
         """Return hash."""
-        return hash(self.repository_id)
+        return hash(self.webhook_id)
 
     def __eq__(self, other: object) -> bool:
         """Return True if objects are equal."""
-        if not isinstance(other, Repository):
+        if not isinstance(other, Webhook):
             return NotImplemented
-        return self.repository_id == other.repository_id
+        return self.webhook_id == other.webhook_id
 
 
 class Chat(BaseModel):
@@ -64,55 +66,44 @@ class Chat(BaseModel):
 
     id: Optional[Union[int, PydanticObjectId]] = Field(None, alias='_id')
     chat_id: int
-    repositories: List[Repository] = []
+    webhooks: List[Webhook] = []
 
     class Config:
         """Configuration of chat model."""
 
         allow_population_by_field_name = True
 
-    def get_repository_by_id(self, repository_id: str) -> Optional[Repository]:
+    def get_webhook_by_id(self, webhook_id: str) -> Optional[Webhook]:
         """
-        Return Repository object by repository_id.
+        Return Webhook object by webhook_id.
 
-        :param repository_id:
+        :param webhook_id:
         :return:
         """
-        for repository in self.repositories:
-            if repository.repository_id == repository_id:
-                return repository
+        for webhook in self.webhooks:
+            if webhook.webhook_id == webhook_id:
+                return webhook
         return None
 
-    def set_repository_name(self, repository_id: str, name: str) -> None:
+    def set_webhook_repository_name(self, webhook_id: str, name: str) -> None:
         """
-        Set repository name.
+        Set webhook repository_name.
 
-        :param repository_id:
+        :param webhook_id:
         :param name:
         :return:
         """
-        for repository in self.repositories:
-            if repository.repository_id == repository_id:
-                repository.name = name
+        for webhook in self.webhooks:
+            if webhook.webhook_id == webhook_id:
+                webhook.repository_name = name
 
-    def delete_repository_by_id(self, repository_id: str) -> None:
+    def delete_webhook_by_id(self, webhook_id: str) -> None:
         """
-        Exclude repository from repositories list by id.
+        Exclude webhook from webhooks list by id.
 
-        :param repository_id:
+        :param webhook_id:
         :return:
         """
-        self.repositories = list(
-            filter(lambda x: x.repository_id != repository_id, self.repositories)
+        self.webhooks = list(
+            filter(lambda x: x.webhook_id != webhook_id, self.webhooks)
         )
-
-    # def dict(self, *args, **kwargs):
-    #     """
-    #     Generate a dictionary representation of the model, optionally specifying which fields to include or exclude.
-    #
-    #     """
-    #     # https://github.com/samuelcolvin/pydantic/issues/1090#issuecomment-612882291
-    #     self.repositories = list(self.repositories)
-    #     result = super().dict(*args, **kwargs)
-    #     self.repositories = set(self.repositories)
-    #     return result

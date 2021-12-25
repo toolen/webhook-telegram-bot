@@ -48,11 +48,11 @@ class BaseDatabaseWrapper(ABC):
         pass
 
     @abstractmethod
-    async def get_chat_by_repository_id(self, repository_id: str) -> Chat:
+    async def get_chat_by_webhook_id(self, webhook_id: str) -> Chat:
         """
-        Return chat by repository id.
+        Return chat by webhook id.
 
-        :param repository_id:
+        :param webhook_id:
         :return:
         """
         pass

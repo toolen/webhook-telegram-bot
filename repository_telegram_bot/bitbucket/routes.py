@@ -17,7 +17,7 @@ def init_bitbucket_routes(app: web.Application) -> None:
     app.add_routes(
         [
             web.post(
-                f'{BITBUCKET_WEBHOOK_ROUTE}/{{repository_id}}',
+                f'{BITBUCKET_WEBHOOK_ROUTE}/{{webhook_id}}',
                 bitbucket_webhook_handler,
                 name='bitbucket-webhook',
             )

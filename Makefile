@@ -3,13 +3,23 @@ repository = toolen/repository-telegram-bot
 version = $(shell poetry version -s)
 tag = $(repository):$(version)
 
-pre-commit:
+fmt:
 	poetry run black .
 	poetry run isort .
+fmt-check:
+	poetry run black . --check
+	poetry run isort . --check
+pre-commit:
+	make fmt
+	make lint
+ci:
+	make fmt-check
+	make lint
+lint:
 	poetry run flake8 --ignore E501 $(package_name)/ tests/
 	make mypy
 	make pydocstyle
-	poetry run pytest --cov=$(package_name) tests/
+	make test
 	poetry run bandit -r $(package_name)
 	poetry run safety check
 	make radon
@@ -32,4 +42,4 @@ scan:
 push:
 	docker trust sign $(tag)
 ngrok:
-	ngrok http 8080
+	ngrok http --region=eu 8080

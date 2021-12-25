@@ -6,9 +6,9 @@ from repository_telegram_bot.telegram.commands import Command
 from repository_telegram_bot.telegram.telegram_api import TelegramAPI
 
 
-async def edit_repository_command_handler(
+async def edit_webhook_command_handler(
     chat_id: int,
-    repository_id: str,
+    webhook_id: str,
     telegram_api: TelegramAPI,
     template_engine: Environment,
 ) -> web.Response:
@@ -16,7 +16,7 @@ async def edit_repository_command_handler(
     Return list of action with selected repository.
 
     :param chat_id:
-    :param repository_id:
+    :param webhook_id:
     :param telegram_api:
     :param template_engine:
     :return:
@@ -26,14 +26,14 @@ async def edit_repository_command_handler(
     inline_keyboard = [
         [
             {
-                'text': '❌ Delete Repository',
-                'callback_data': f'{Command.DELETE_REPOSITORY}_{repository_id}',
+                'text': '❌ Delete Webhook',
+                'callback_data': f'{Command.DELETE_WEBHOOK}_{webhook_id}',
             }
         ],
         [
             {
                 'text': '🔙 Back',
-                'callback_data': Command.EDIT_REPOSITORIES,
+                'callback_data': Command.EDIT_WEBHOOKS,
             }
         ],
     ]

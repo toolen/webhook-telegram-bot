@@ -49,9 +49,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             raise ChatNotFound()
 
-    async def get_chat_by_repository_id(self, repository_id: str) -> Chat:
-        """Return chat object by repository id."""
-        document_filter = {'repositories.repository_id': repository_id}
+    async def get_chat_by_webhook_id(self, webhook_id: str) -> Chat:
+        """
+        Return chat object by webhook id.
+
+        :param webhook_id:
+        :return:
+        """
+        document_filter = {'webhooks.webhook_id': webhook_id}
         collection: AsyncIOMotorCollection = self.get_collection('chats')
         document: Optional[Document] = await collection.find_one(document_filter)
         if document:
@@ -61,7 +66,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             raise ChatNotFound()
 
     async def save_chat(self, chat: Chat) -> Chat:
-        """Save chat object to database."""
+        """
+        Save chat object to database.
+
+        :param chat:
+        :return:
+        """
         collection: AsyncIOMotorCollection = self.get_collection('chats')
         chat_as_dict = chat.dict()
         if chat.id:
