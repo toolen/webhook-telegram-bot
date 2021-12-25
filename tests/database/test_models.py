@@ -4,7 +4,7 @@ from uuid import uuid4
 from bson import ObjectId
 from first import first
 
-from repository_telegram_bot.database.models import Chat, Service, Webhook
+from webhook_telegram_bot.database.models import Chat, Service, Webhook
 
 
 def test_create_chat_model_with_repository():

@@ -4,15 +4,15 @@ import pytest
 from aiohttp import web
 from jinja2 import Environment
 
-from repository_telegram_bot.config import get_config as get_default_config
-from repository_telegram_bot.database.backends.mongo import DatabaseWrapper
-from repository_telegram_bot.helpers import (
+from webhook_telegram_bot.config import get_config as get_default_config
+from webhook_telegram_bot.database.backends.mongo import DatabaseWrapper
+from webhook_telegram_bot.helpers import (
     get_config,
     get_database,
     get_telegram_api,
     get_template_engine,
 )
-from repository_telegram_bot.main import (
+from webhook_telegram_bot.main import (
     create_app,
     init_bitbucket,
     init_config,
@@ -21,7 +21,7 @@ from repository_telegram_bot.main import (
     init_telegram,
     init_templates,
 )
-from repository_telegram_bot.telegram.telegram_api import TelegramAPI
+from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
 app = web.Application()
 
@@ -42,7 +42,7 @@ def test_init_config_with_override():
 def test_init_logging(caplog):
     default_config = get_default_config()
     log_level = default_config.get('LOG_LEVEL')
-    caplog.set_level(log_level, logger='repository_telegram_bot.main')
+    caplog.set_level(log_level, logger='webhook_telegram_bot.main')
     init_logging(app)
     assert f'Logging configured with {log_level} level.' in caplog.messages
 
@@ -146,7 +146,7 @@ def test_init_bitbucket():
 async def test_create_app(caplog, aiohttp_server, telegram_server_mock):
     default_config = get_default_config()
     log_level = default_config.get('LOG_LEVEL')
-    caplog.set_level(log_level, logger='repository_telegram_bot.main')
+    caplog.set_level(log_level, logger='webhook_telegram_bot.main')
 
     test_app = await create_app(
         {

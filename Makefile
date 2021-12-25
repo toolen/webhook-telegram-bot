@@ -1,5 +1,5 @@
-package_name = repository_telegram_bot
-repository = toolen/repository-telegram-bot
+package_name = webhook_telegram_bot
+repository = toolen/webhook-telegram-bot
 version = $(shell poetry version -s)
 tag = $(repository):$(version)
 

@@ -4,9 +4,9 @@ import pytest
 from first import first
 from motor.motor_asyncio import AsyncIOMotorCollection
 
-from repository_telegram_bot.database.backends.mongo import DatabaseWrapper
-from repository_telegram_bot.database.exceptions import ChatNotFound
-from repository_telegram_bot.database.models import Chat, Service, Webhook
+from webhook_telegram_bot.database.backends.mongo import DatabaseWrapper
+from webhook_telegram_bot.database.exceptions import ChatNotFound
+from webhook_telegram_bot.database.models import Chat, Service, Webhook
 
 
 async def test_get_chat_by_chat_id(db_wrapper: DatabaseWrapper):

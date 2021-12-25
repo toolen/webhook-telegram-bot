@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "repository-telegram-bot"
+name = "webhook-telegram-bot"
 version = "0.1.0"
 description = ""
 authors = ["Dmitrii Zakharov <dmitrii@zakharov.cc>"]
