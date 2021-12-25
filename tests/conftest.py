@@ -1,9 +1,9 @@
 import pytest
 from aiohttp import web
 
-from repository_telegram_bot.config import get_config
-from repository_telegram_bot.helpers import get_db_wrapper_instance
-from repository_telegram_bot.main import create_app
+from webhook_telegram_bot.config import get_config
+from webhook_telegram_bot.helpers import get_db_wrapper_instance
+from webhook_telegram_bot.main import create_app
 
 
 @pytest.fixture

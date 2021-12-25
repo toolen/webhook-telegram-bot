@@ -1,4 +1,4 @@
-from repository_telegram_bot.utils import deep_get
+from webhook_telegram_bot.utils import deep_get
 
 
 def test_deep_get():

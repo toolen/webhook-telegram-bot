@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 from aiohttp import web
 
-from repository_telegram_bot.helpers import (
+from webhook_telegram_bot.helpers import (
     CONFIG_KEY,
     DATABASE_KEY,
     TELEGRAM_API_KEY,
