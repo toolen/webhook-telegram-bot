@@ -85,7 +85,10 @@ class RepositoryEventProcessor(EventProcessor):
 
         :return:
         """
-        return cast(str, deep_get(self.changes, 'new.name') or deep_get(self.changes, 'old.name'))
+        return cast(
+            str,
+            deep_get(self.changes, 'new.name') or deep_get(self.changes, 'old.name'),
+        )
 
     @property
     def branch_href(self) -> Optional[str]:
@@ -94,7 +97,11 @@ class RepositoryEventProcessor(EventProcessor):
 
         :return:
         """
-        return cast(str, deep_get(self.changes, 'links.html.href') or deep_get(self.changes, 'old.links.html.href'))
+        return cast(
+            str,
+            deep_get(self.changes, 'links.html.href')
+            or deep_get(self.changes, 'old.links.html.href'),
+        )
 
     @property
     def is_created(self) -> Optional[bool]:

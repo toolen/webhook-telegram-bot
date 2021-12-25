@@ -16,7 +16,7 @@ ci:
 	make fmt-check
 	make lint
 lint:
-	poetry run flake8 --ignore E501 $(package_name)/ tests/
+	poetry run flake8 --ignore E501,W503 $(package_name)/ tests/
 	make mypy
 	make pydocstyle
 	make test
