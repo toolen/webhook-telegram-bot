@@ -4,14 +4,14 @@ import uuid
 from aiohttp import web
 from jinja2 import Environment
 
-from webhook_telegram_bot.bitbucket.constants import (
-    BITBUCKET_TEMPLATE_START,
-    BITBUCKET_WEBHOOK_ROUTE,
-)
 from webhook_telegram_bot.database.backends.types import DatabaseWrapperImpl
 from webhook_telegram_bot.database.exceptions import ChatNotFound
 from webhook_telegram_bot.database.models import Chat, Service, Webhook
 from webhook_telegram_bot.helpers import get_config_value
+from webhook_telegram_bot.plugins.bitbucket.constants import (
+    BITBUCKET_TEMPLATE_START,
+    BITBUCKET_WEBHOOK_ROUTE,
+)
 from webhook_telegram_bot.telegram.commands import Command
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 

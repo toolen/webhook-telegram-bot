@@ -1,17 +1,19 @@
 """This file contains application helpers."""
 import importlib
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, List, Optional, Union, cast
 
 from aiohttp import web
-from jinja2 import Environment
+from jinja2 import Environment, PackageLoader
 
 from webhook_telegram_bot.database.backends.types import DatabaseWrapperImpl
+from webhook_telegram_bot.plugins.types import AbstractPluginImpl
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
 CONFIG_KEY = 'CONFIG'
 DATABASE_KEY = 'DB'
 TELEGRAM_API_KEY = 'TELEGRAM_API'
 TEMPLATE_ENGINE_KEY = 'TEMPLATE_ENGINE'
+PLUGINS_INSTANCES_KEY = 'PLUGINS_INSTANCES'
 
 
 def set_config(app: web.Application, config: Dict[str, Any]) -> None:
@@ -35,7 +37,7 @@ def get_config(app: web.Application) -> Dict[str, Any]:
     return cast(Dict[str, Any], app[CONFIG_KEY])
 
 
-def get_config_value(app: web.Application, key: str) -> Optional[str]:
+def get_config_value(app: web.Application, key: str) -> Optional[Union[str, List[str]]]:
     """
     Return config value by key.
 
@@ -120,5 +122,39 @@ def get_db_wrapper_instance(
     :return:
     """
     module = importlib.import_module(database_engine)
-    db_wrapper_class = getattr(module, 'MongoDatabaseWrapper')
+    db_wrapper_class = getattr(module, 'DatabaseWrapper')
     return cast(DatabaseWrapperImpl, db_wrapper_class(database_url))
+
+
+def get_prefix_loader_for_plugin(plugin: str) -> Dict[str, PackageLoader]:
+    """
+    Return arguments from plugin to PrefixLoader.
+
+    :param plugin:
+    :return:
+    """
+    key = plugin.split('.').pop()
+    return {key: PackageLoader(plugin, 'templates')}
+
+
+def set_plugins_instances(
+    app: web.Application, plugins_instances: List[AbstractPluginImpl]
+) -> None:
+    """
+    Set list of plugin instances into application.
+
+    :param app:
+    :param plugins_instances:
+    :return:
+    """
+    app[PLUGINS_INSTANCES_KEY] = plugins_instances
+
+
+def get_plugins_instances(app: web.Application) -> List[AbstractPluginImpl]:
+    """
+    Return list of plugin instances.
+
+    :param app:
+    :return:
+    """
+    return app[PLUGINS_INSTANCES_KEY]

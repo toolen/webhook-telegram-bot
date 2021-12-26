@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Tuple, Union, cast
 
 from first import first
 
-from webhook_telegram_bot.bitbucket.constants import (
+from webhook_telegram_bot.plugins.bitbucket.constants import (
     BITBUCKET_TEMPLATE_BRANCH_CLOSED,
     BITBUCKET_TEMPLATE_BRANCH_CREATED,
     BITBUCKET_TEMPLATE_BRANCH_UPDATED,
