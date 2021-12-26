@@ -2,7 +2,9 @@
 from aiohttp import web
 from jinja2 import Environment
 
+from webhook_telegram_bot.bitbucket.commands import BitbucketCommand
 from webhook_telegram_bot.telegram.commands import Command
+from webhook_telegram_bot.telegram.constants import TELEGRAM_TEMPLATE_SELECT_SERVICE
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
 
@@ -17,7 +19,7 @@ async def add_webhook_command_handler(
     :param template_engine:
     :return:
     """
-    template = template_engine.get_template('select_service.html')
+    template = template_engine.get_template(TELEGRAM_TEMPLATE_SELECT_SERVICE)
     text = template.render()
     return telegram_api.send_message_as_response(
         chat_id=chat_id,
@@ -29,7 +31,7 @@ async def add_webhook_command_handler(
                 [
                     {
                         'text': 'Bitbucket',
-                        'callback_data': Command.ADD_BITBUCKET_WEBHOOK,
+                        'callback_data': BitbucketCommand.ADD_BITBUCKET_WEBHOOK,
                     }
                 ],
                 [

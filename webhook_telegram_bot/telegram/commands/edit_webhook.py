@@ -3,6 +3,7 @@ from aiohttp import web
 from jinja2 import Environment
 
 from webhook_telegram_bot.telegram.commands import Command
+from webhook_telegram_bot.telegram.constants import TELEGRAM_TEMPLATE_EDIT_WEBHOOK
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
 
@@ -21,7 +22,7 @@ async def edit_webhook_command_handler(
     :param template_engine:
     :return:
     """
-    template = template_engine.get_template('edit_webhook.html')
+    template = template_engine.get_template(TELEGRAM_TEMPLATE_EDIT_WEBHOOK)
     text = template.render()
     inline_keyboard = [
         [

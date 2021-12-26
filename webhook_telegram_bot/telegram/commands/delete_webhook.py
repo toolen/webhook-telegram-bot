@@ -6,6 +6,10 @@ from webhook_telegram_bot.database.backends.types import DatabaseWrapperImplemen
 from webhook_telegram_bot.database.exceptions import ChatNotFound
 from webhook_telegram_bot.database.models import Chat
 from webhook_telegram_bot.telegram.commands import Command
+from webhook_telegram_bot.telegram.constants import (
+    TELEGRAM_TEMPLATE_CHAT_NOT_FOUND,
+    TELEGRAM_TEMPLATE_WEBHOOK_DELETED,
+)
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
 
@@ -31,7 +35,7 @@ async def delete_webhook_command_handler(
         chat.delete_webhook_by_id(webhook_id)
         await db.save_chat(chat)
 
-        template = template_engine.get_template('webhook_deleted.html')
+        template = template_engine.get_template(TELEGRAM_TEMPLATE_WEBHOOK_DELETED)
         text = template.render()
         inline_keyboard = [
             [
@@ -44,7 +48,7 @@ async def delete_webhook_command_handler(
             ]
         ]
     except ChatNotFound:
-        template = template_engine.get_template('chat_not_found.html')
+        template = template_engine.get_template(TELEGRAM_TEMPLATE_CHAT_NOT_FOUND)
         text = template.render()
         inline_keyboard = [
             [

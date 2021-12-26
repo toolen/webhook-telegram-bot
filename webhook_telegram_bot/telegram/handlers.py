@@ -6,15 +6,16 @@ from typing import Optional
 from aiohttp import web
 from aiohttp.web_request import Request
 
+from webhook_telegram_bot.bitbucket.commands import BitbucketCommand
+from webhook_telegram_bot.bitbucket.commands.add_bitbucket_webhook import (
+    add_bitbucket_webhook_command_handler,
+)
 from webhook_telegram_bot.helpers import (
     get_database,
     get_telegram_api,
     get_template_engine,
 )
 from webhook_telegram_bot.telegram.commands import Command
-from webhook_telegram_bot.telegram.commands.add_bitbucket_webhook import (
-    add_bitbucket_webhook_command_handler,
-)
 from webhook_telegram_bot.telegram.commands.add_webhook import (
     add_webhook_command_handler,
 )
@@ -60,7 +61,7 @@ async def telegram_request_handler(request: Request) -> web.Response:
     elif text == Command.ADD_WEBHOOK:
         return await add_webhook_command_handler(chat_id, telegram_api, template_engine)
 
-    elif text == Command.ADD_BITBUCKET_WEBHOOK:
+    elif text == BitbucketCommand.ADD_BITBUCKET_WEBHOOK:
         return await add_bitbucket_webhook_command_handler(
             app, chat_id, db, telegram_api, template_engine
         )

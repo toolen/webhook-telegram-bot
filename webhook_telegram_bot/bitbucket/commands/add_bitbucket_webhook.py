@@ -4,7 +4,10 @@ import uuid
 from aiohttp import web
 from jinja2 import Environment
 
-from webhook_telegram_bot.bitbucket.constants import BITBUCKET_WEBHOOK_ROUTE
+from webhook_telegram_bot.bitbucket.constants import (
+    BITBUCKET_TEMPLATE_START,
+    BITBUCKET_WEBHOOK_ROUTE,
+)
 from webhook_telegram_bot.database.backends.types import DatabaseWrapperImplementation
 from webhook_telegram_bot.database.exceptions import ChatNotFound
 from webhook_telegram_bot.database.models import Chat, Service, Webhook
@@ -42,7 +45,7 @@ async def add_bitbucket_webhook_command_handler(
         chat = Chat(chat_id=chat_id, webhooks=[webhook])
         await db.save_chat(chat)
 
-    template = template_engine.get_template('bitbucket/start.html')
+    template = template_engine.get_template(BITBUCKET_TEMPLATE_START)
     text = template.render(
         webhook_url=f'{telegram_webhook_host}{BITBUCKET_WEBHOOK_ROUTE}/{webhook_id}'
     )

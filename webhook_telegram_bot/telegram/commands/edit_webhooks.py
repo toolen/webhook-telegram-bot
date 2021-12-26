@@ -5,6 +5,10 @@ from jinja2 import Environment
 from webhook_telegram_bot.database.backends.types import DatabaseWrapperImplementation
 from webhook_telegram_bot.database.exceptions import ChatNotFound
 from webhook_telegram_bot.telegram.commands import Command
+from webhook_telegram_bot.telegram.constants import (
+    TELEGRAM_TEMPLATE_CHAT_NOT_FOUND,
+    TELEGRAM_TEMPLATE_EDIT_WEBHOOKS,
+)
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
 
@@ -24,7 +28,7 @@ async def edit_webhooks_command_handler(
     :return:
     """
     try:
-        template = template_engine.get_template('edit_webhooks.html')
+        template = template_engine.get_template(TELEGRAM_TEMPLATE_EDIT_WEBHOOKS)
         text = template.render()
 
         chat = await db.get_chat_by_chat_id(chat_id)
@@ -49,7 +53,7 @@ async def edit_webhooks_command_handler(
         )
 
     except ChatNotFound:
-        template = template_engine.get_template('chat_not_found.html')
+        template = template_engine.get_template(TELEGRAM_TEMPLATE_CHAT_NOT_FOUND)
         text = template.render()
         inline_keyboard = [
             [

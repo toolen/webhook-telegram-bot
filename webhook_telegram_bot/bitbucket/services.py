@@ -4,6 +4,14 @@ from typing import Any, Dict, Optional, Tuple, Union, cast
 
 from first import first
 
+from webhook_telegram_bot.bitbucket.constants import (
+    BITBUCKET_TEMPLATE_BRANCH_CLOSED,
+    BITBUCKET_TEMPLATE_BRANCH_CREATED,
+    BITBUCKET_TEMPLATE_BRANCH_UPDATED,
+    BITBUCKET_TEMPLATE_PIPELINE_EVENT,
+    BITBUCKET_TEMPLATE_PULL_REQUEST_EVENT,
+    BITBUCKET_TEMPLATE_UNKNOWN_EVENT,
+)
 from webhook_telegram_bot.utils import deep_get
 
 
@@ -215,17 +223,17 @@ class RepositoryEventProcessor(EventProcessor):
         """
         context = self.get_context()
         if self.action == 'push':
-            template_name = 'bitbucket/branch_updated.html'
+            template_name = BITBUCKET_TEMPLATE_BRANCH_UPDATED
             if self.is_created:
-                template_name = 'bitbucket/branch_created.html'
+                template_name = BITBUCKET_TEMPLATE_BRANCH_CREATED
             if self.is_closed:
-                template_name = 'bitbucket/branch_closed.html'
+                template_name = BITBUCKET_TEMPLATE_BRANCH_CLOSED
         elif self.action in ('commit_status_created', 'commit_status_updated'):
-            template_name = 'bitbucket/pipeline_event.html'
+            template_name = BITBUCKET_TEMPLATE_PIPELINE_EVENT
         else:
             context['event'] = f'{self.entity}:{self.action}'
             context['webhook_settings_href'] = f'{self.repository_href}/admin/webhooks'
-            template_name = 'bitbucket/unknown_event.html'
+            template_name = BITBUCKET_TEMPLATE_UNKNOWN_EVENT
         return template_name, context
 
 
@@ -294,7 +302,7 @@ class PullRequestEventProcessor(EventProcessor):
 
         :return:
         """
-        return 'bitbucket/pull_request_event.html', self.get_context()
+        return BITBUCKET_TEMPLATE_PULL_REQUEST_EVENT, self.get_context()
 
 
 class UnknownEventProcessor(EventProcessor):
@@ -318,7 +326,7 @@ class UnknownEventProcessor(EventProcessor):
 
         :return:
         """
-        return 'bitbucket/unknown_event.html', {
+        return BITBUCKET_TEMPLATE_UNKNOWN_EVENT, {
             'repository_name': self.repository_name,
             'event': f'{self.entity}:{self.action}',
         }
