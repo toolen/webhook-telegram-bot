@@ -3,7 +3,7 @@ import logging
 from typing import Dict, Optional
 
 from aiohttp import web
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader, PrefixLoader, select_autoescape
 
 from webhook_telegram_bot.bitbucket.routes import init_bitbucket_routes
 from webhook_telegram_bot.config import get_config
@@ -83,7 +83,14 @@ def init_templates(app: web.Application) -> None:
     :return:
     """
     template_engine: Environment = Environment(
-        loader=PackageLoader('webhook_telegram_bot', 'templates'),
+        loader=PrefixLoader(
+            {
+                'telegram': PackageLoader('webhook_telegram_bot.telegram', 'templates'),
+                'bitbucket': PackageLoader(
+                    'webhook_telegram_bot.bitbucket', 'templates'
+                ),
+            }
+        ),
         autoescape=select_autoescape(['html']),
         trim_blocks=True,
         lstrip_blocks=True,

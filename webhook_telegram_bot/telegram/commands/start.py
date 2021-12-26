@@ -6,6 +6,7 @@ from webhook_telegram_bot.database.backends.types import DatabaseWrapperImplemen
 from webhook_telegram_bot.database.exceptions import ChatNotFound
 from webhook_telegram_bot.database.models import Chat
 from webhook_telegram_bot.telegram.commands import Command
+from webhook_telegram_bot.telegram.constants import TELEGRAM_TEMPLATE_START
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
 
@@ -24,7 +25,7 @@ async def start_command_handler(
     :param template_engine:
     :return:
     """
-    template = template_engine.get_template('start.html')
+    template = template_engine.get_template(TELEGRAM_TEMPLATE_START)
     text = template.render()
     inline_keyboard = [
         [
