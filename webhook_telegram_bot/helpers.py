@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional, cast
 from aiohttp import web
 from jinja2 import Environment
 
-from webhook_telegram_bot.database.backends.types import DatabaseWrapperImplementation
+from webhook_telegram_bot.database.backends.types import DatabaseWrapperImpl
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
 CONFIG_KEY = 'CONFIG'
@@ -46,7 +46,7 @@ def get_config_value(app: web.Application, key: str) -> Optional[str]:
     return get_config(app).get(key)
 
 
-def set_database(app: web.Application, database: DatabaseWrapperImplementation) -> None:
+def set_database(app: web.Application, database: DatabaseWrapperImpl) -> None:
     """
     Set database instance into application.
 
@@ -57,14 +57,14 @@ def set_database(app: web.Application, database: DatabaseWrapperImplementation) 
     app[DATABASE_KEY] = database
 
 
-def get_database(app: web.Application) -> DatabaseWrapperImplementation:
+def get_database(app: web.Application) -> DatabaseWrapperImpl:
     """
     Return database instance from application.
 
     :param app:
     :return:
     """
-    return cast(DatabaseWrapperImplementation, app[DATABASE_KEY])
+    return cast(DatabaseWrapperImpl, app[DATABASE_KEY])
 
 
 def set_telegram_api(app: web.Application, telegram_api: TelegramAPI) -> None:
@@ -111,7 +111,7 @@ def get_template_engine(app: web.Application) -> Environment:
 
 def get_db_wrapper_instance(
     database_engine: str, database_url: str
-) -> DatabaseWrapperImplementation:
+) -> DatabaseWrapperImpl:
     """
     Return database wrapper instance, according configuration.
 
@@ -120,5 +120,5 @@ def get_db_wrapper_instance(
     :return:
     """
     module = importlib.import_module(database_engine)
-    db_wrapper_class = getattr(module, 'DatabaseWrapper')
-    return cast(DatabaseWrapperImplementation, db_wrapper_class(database_url))
+    db_wrapper_class = getattr(module, 'MongoDatabaseWrapper')
+    return cast(DatabaseWrapperImpl, db_wrapper_class(database_url))

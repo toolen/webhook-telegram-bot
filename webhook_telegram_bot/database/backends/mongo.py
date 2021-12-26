@@ -16,11 +16,11 @@ from webhook_telegram_bot.database.models import Chat
 Document = Dict[str, Union[int, str, List[Dict[str, str]]]]
 
 
-class DatabaseWrapper(BaseDatabaseWrapper):
+class MongoDatabaseWrapper(BaseDatabaseWrapper):
     """This class implements BaseDatabaseWrapper for MongoDB."""
 
     def __init__(self, url: str):
-        """Construct DatabaseWrapper class."""
+        """Construct MongoDatabaseWrapper class."""
         self.client: AgnosticClient = AsyncIOMotorClient(url)
         self.db: AsyncIOMotorDatabase = self.client.get_default_database()
         self.closed = False
@@ -31,7 +31,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         self.closed = True
 
     def get_collection(self, collection_name: str) -> AsyncIOMotorCollection:
-        """Return collection by name."""
+        """
+        Return collection by name.
+
+        :param collection_name:
+        :return:
+        """
         return self.db[collection_name]
 
     async def drop_database(self) -> None:
@@ -39,7 +44,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         await self.client.drop_database(self.db.name)
 
     async def get_chat_by_chat_id(self, chat_id: int) -> Chat:
-        """Return chat object by id."""
+        """
+        Return chat object by id.
+
+        :param chat_id:
+        :return:
+        """
         document_filter = {'chat_id': chat_id}
         collection: AsyncIOMotorCollection = self.get_collection('chats')
         document: Optional[Document] = await collection.find_one(document_filter)

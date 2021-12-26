@@ -1,6 +1,6 @@
 """This file contains types for database layer."""
 from typing import Union
 
-from webhook_telegram_bot.database.backends.mongo import DatabaseWrapper
+from webhook_telegram_bot.database.backends.mongo import MongoDatabaseWrapper
 
-DatabaseWrapperImplementation = Union[DatabaseWrapper]
+DatabaseWrapperImpl = Union[MongoDatabaseWrapper]

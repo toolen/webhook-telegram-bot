@@ -5,7 +5,8 @@ from aiohttp import web
 from jinja2 import Environment
 
 from webhook_telegram_bot.config import get_config as get_default_config
-from webhook_telegram_bot.database.backends.mongo import DatabaseWrapper
+from webhook_telegram_bot.database.backends.types import DatabaseWrapperImpl
+from webhook_telegram_bot.exceptions import DatabaseUnconfiguredException
 from webhook_telegram_bot.helpers import (
     get_config,
     get_database,
@@ -47,10 +48,28 @@ def test_init_logging(caplog):
     assert f'Logging configured with {log_level} level.' in caplog.messages
 
 
+async def test_unconfigured_database():
+    test_app = web.Application()
+    init_config(
+        test_app,
+        {
+            'DATABASE_URL': None,
+        },
+    )
+    with pytest.raises(DatabaseUnconfiguredException):
+        await init_database(test_app)
+    init_config(test_app, {'DATABASE_ENGINE': None})
+    with pytest.raises(DatabaseUnconfiguredException):
+        await init_database(test_app)
+    init_config(test_app, {'DATABASE_URL': None, 'DATABASE_ENGINE': None})
+    with pytest.raises(DatabaseUnconfiguredException):
+        await init_database(test_app)
+
+
 async def test_init_database():
     await init_database(app)
     db = get_database(app)
-    assert isinstance(db, DatabaseWrapper)
+    assert isinstance(db, DatabaseWrapperImpl)
 
 
 async def test_close_database():
@@ -158,7 +177,7 @@ async def test_create_app(caplog, aiohttp_server, telegram_server_mock):
 
     assert get_config(test_app) is not None
     assert f'Logging configured with {log_level} level.' in caplog.messages
-    assert isinstance(get_database(test_app), DatabaseWrapper)
+    assert isinstance(get_database(test_app), DatabaseWrapperImpl)
     assert isinstance(get_template_engine(test_app), Environment)
     assert isinstance(get_telegram_api(test_app), TelegramAPI)
     assert test_app.router['bitbucket-webhook'] is not None

@@ -1,8 +1,11 @@
 from typing import List
+from unittest.mock import Mock
 from uuid import uuid4
 
+import pytest
 from bson import ObjectId
 from first import first
+from pydantic import ValidationError
 
 from webhook_telegram_bot.database.models import Chat, Service, Webhook
 
@@ -93,3 +96,61 @@ def test_deserialize_chat_model_with_repository_from_rdb_dict():
     assert len(chat_parsed.webhooks) == 1
     assert isinstance(first(chat_parsed.webhooks), Webhook)
     assert first(chat_parsed.webhooks).webhook_id == webhook_id
+
+
+def test_chat_id_validation():
+    Chat(chat_id=1, webhooks=[])
+    # Chat(chat_id=ObjectId(b'foo-bar-buzz'), webhooks=[])
+    with pytest.raises(ValidationError):
+        Chat(chat_id=Mock(), webhooks=[])
+
+
+def test_webhook_equality():
+    webhook_a = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
+    webhook_b = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
+    assert webhook_a == webhook_a
+    assert webhook_a != webhook_b
+    assert webhook_a != Mock()
+
+
+def test_get_webhook_by_id():
+    webhook_b_id = uuid4().hex
+    webhook_a = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
+    webhook_b = Webhook(webhook_id=webhook_b_id, service=Service.BITBUCKET)
+    chat = Chat(chat_id=1, webhooks=[webhook_a, webhook_b])
+
+    webhook = chat.get_webhook_by_id(webhook_b_id)
+
+    assert webhook != webhook_a
+    assert webhook == webhook_b
+
+
+def test_get_webhook_by_id_returns_none():
+    chat = Chat(chat_id=1, webhooks=[])
+
+    webhook = chat.get_webhook_by_id(uuid4().hex)
+
+    assert webhook is None
+
+
+def test_set_webhook_repository_name():
+    webhook_a = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
+    webhook_b = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
+    chat = Chat(chat_id=1, webhooks=[webhook_a, webhook_b])
+
+    repository_name = uuid4().hex
+    chat.set_webhook_repository_name(webhook_b.webhook_id, repository_name)
+
+    webhook = chat.get_webhook_by_id(webhook_b.webhook_id)
+    assert webhook.repository_name == repository_name
+
+
+def test_delete_webhook_by_id():
+    webhook_a = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
+    webhook_b = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
+    chat = Chat(chat_id=1, webhooks=[webhook_a, webhook_b])
+
+    chat.delete_webhook_by_id(webhook_b.webhook_id)
+
+    assert len(chat.webhooks) == 1
+    assert chat.webhooks[0].webhook_id == webhook_a.webhook_id

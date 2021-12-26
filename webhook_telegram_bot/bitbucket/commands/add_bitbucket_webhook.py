@@ -8,7 +8,7 @@ from webhook_telegram_bot.bitbucket.constants import (
     BITBUCKET_TEMPLATE_START,
     BITBUCKET_WEBHOOK_ROUTE,
 )
-from webhook_telegram_bot.database.backends.types import DatabaseWrapperImplementation
+from webhook_telegram_bot.database.backends.types import DatabaseWrapperImpl
 from webhook_telegram_bot.database.exceptions import ChatNotFound
 from webhook_telegram_bot.database.models import Chat, Service, Webhook
 from webhook_telegram_bot.helpers import get_config_value
@@ -19,7 +19,7 @@ from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 async def add_bitbucket_webhook_command_handler(
     app: web.Application,
     chat_id: int,
-    db: DatabaseWrapperImplementation,
+    db: DatabaseWrapperImpl,
     telegram_api: TelegramAPI,
     template_engine: Environment,
 ) -> web.Response:

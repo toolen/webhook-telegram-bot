@@ -2,7 +2,7 @@
 from aiohttp import web
 from jinja2 import Environment
 
-from webhook_telegram_bot.database.backends.types import DatabaseWrapperImplementation
+from webhook_telegram_bot.database.backends.types import DatabaseWrapperImpl
 from webhook_telegram_bot.database.exceptions import ChatNotFound
 from webhook_telegram_bot.database.models import Chat
 from webhook_telegram_bot.telegram.commands import Command
@@ -12,7 +12,7 @@ from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
 async def start_command_handler(
     chat_id: int,
-    db: DatabaseWrapperImplementation,
+    db: DatabaseWrapperImpl,
     telegram_api: TelegramAPI,
     template_engine: Environment,
 ) -> web.Response:
