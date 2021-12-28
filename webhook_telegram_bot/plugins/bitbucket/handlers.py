@@ -6,7 +6,6 @@ from typing import Optional, cast
 from aiohttp import web
 from aiohttp.web_request import Request
 
-from webhook_telegram_bot.bitbucket.services import BitbucketEventProcessor
 from webhook_telegram_bot.database.exceptions import ChatNotFound
 from webhook_telegram_bot.database.models import Chat, Webhook
 from webhook_telegram_bot.helpers import (
@@ -14,6 +13,7 @@ from webhook_telegram_bot.helpers import (
     get_telegram_api,
     get_template_engine,
 )
+from webhook_telegram_bot.plugins.bitbucket.services import BitbucketEventProcessor
 from webhook_telegram_bot.utils import deep_get
 
 logger = logging.getLogger(__name__)
@@ -67,28 +67,3 @@ async def bitbucket_webhook_handler(request: Request) -> web.Response:
             logger.error(f'Couldn\'t find chat by webhook_id={webhook_id}')
 
     return web.Response()
-
-
-async def bitbucket_debug_template_handler(request: Request) -> web.Response:
-    """
-    Debug templates.
-
-    :param request:
-    :return:
-    """
-    app = request.app
-    template_engine = get_template_engine(app)
-    template_name = request.match_info.get('template_name')
-    template = template_engine.get_template(f'bitbucket/{template_name}.html')
-    text = template.render(
-        {
-            'repository_name': 'btb-test-repo',
-            'actor_display_name': 'Dmitrii Zakharov',
-            'action': 'push',
-            'number_of_commits': 1,
-            'branch_name': 'ch/new-branch',
-            'branch_href': '#',
-            'is_created': True,
-        }
-    )
-    return web.Response(text=text)

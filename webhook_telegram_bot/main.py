@@ -1,20 +1,22 @@
 """This file contains application methods."""
+import importlib
 import logging
-from typing import Dict, Optional
+from typing import Dict, List, Optional, cast
 
 from aiohttp import web
 from jinja2 import Environment, PackageLoader, PrefixLoader, select_autoescape
 
-from webhook_telegram_bot.bitbucket.routes import init_bitbucket_routes
 from webhook_telegram_bot.config import get_config
 from webhook_telegram_bot.exceptions import DatabaseUnconfiguredException
 from webhook_telegram_bot.helpers import (
     get_config_value,
     get_database,
     get_db_wrapper_instance,
+    get_prefix_loader_for_plugin,
     get_telegram_api,
     set_config,
     set_database,
+    set_plugins_instances,
     set_telegram_api,
     set_template_engine,
 )
@@ -48,7 +50,7 @@ def init_logging(app: web.Application) -> None:
     :param app:
     :return:
     """
-    log_level = get_config_value(app, 'LOG_LEVEL')
+    log_level = cast(str, get_config_value(app, 'LOG_LEVEL'))
     logging.basicConfig(level=log_level)
     logger.debug(f'Logging configured with {log_level} level.')
 
@@ -65,14 +67,30 @@ async def init_database(app: web.Application) -> None:
         db_ = get_database(app_)
         db_.close()
 
-    database_url = get_config_value(app, 'DATABASE_URL')
-    database_engine = get_config_value(app, 'DATABASE_ENGINE')
+    database_url = cast(str, get_config_value(app, 'DATABASE_URL'))
+    database_engine = cast(str, get_config_value(app, 'DATABASE_ENGINE'))
     if database_url and database_engine:
         db = get_db_wrapper_instance(database_engine, database_url)
         set_database(app, db)
         app.on_cleanup.append(close_database)
     else:
         raise DatabaseUnconfiguredException()
+
+
+def init_plugins(app: web.Application) -> None:
+    """
+    Initialize application plugins.
+
+    :param app:
+    :return:
+    """
+    plugins = get_config_value(app, 'PLUGINS') or []
+    plugins_instances = []
+    for plugin in plugins:
+        module = importlib.import_module(f'{plugin}.plugin')
+        if hasattr(module, 'Plugin'):
+            plugins_instances.append(module.Plugin(app))
+    set_plugins_instances(app, plugins_instances)
 
 
 def init_templates(app: web.Application) -> None:
@@ -82,15 +100,15 @@ def init_templates(app: web.Application) -> None:
     :param app:
     :return:
     """
+    prefix_loader_mapping = {
+        'telegram': PackageLoader('webhook_telegram_bot.telegram', 'templates'),
+    }
+    for plugin in cast(List[str], get_config_value(app, 'PLUGINS')):
+        mapping = get_prefix_loader_for_plugin(plugin)
+        prefix_loader_mapping.update(**mapping)
+
     template_engine: Environment = Environment(
-        loader=PrefixLoader(
-            {
-                'telegram': PackageLoader('webhook_telegram_bot.telegram', 'templates'),
-                'bitbucket': PackageLoader(
-                    'webhook_telegram_bot.bitbucket', 'templates'
-                ),
-            }
-        ),
+        loader=PrefixLoader(prefix_loader_mapping),
         autoescape=select_autoescape(['html']),
         trim_blocks=True,
         lstrip_blocks=True,
@@ -107,8 +125,10 @@ def init_telegram(app: web.Application) -> None:
     """
 
     async def on_startup_telegram_handler(app_: web.Application) -> None:
-        telegram_api_endpoint = get_config_value(app_, 'TELEGRAM_API_ENDPOINT')
-        telegram_api_token = get_config_value(app_, 'TELEGRAM_API_TOKEN')
+        telegram_api_endpoint = cast(
+            str, get_config_value(app_, 'TELEGRAM_API_ENDPOINT')
+        )
+        telegram_api_token = cast(str, get_config_value(app_, 'TELEGRAM_API_TOKEN'))
 
         if not telegram_api_endpoint:
             raise Exception('TELEGRAM_API_ENDPOINT undefined')
@@ -136,16 +156,6 @@ def init_telegram(app: web.Application) -> None:
     init_telegram_routes(app)
 
 
-def init_bitbucket(app: web.Application) -> None:
-    """
-    Initialize Bitbucket package.
-
-    :param app:
-    :return:
-    """
-    init_bitbucket_routes(app)
-
-
 async def create_app(config: Optional[Dict[str, str]] = None) -> web.Application:
     """
     Create application.
@@ -156,9 +166,9 @@ async def create_app(config: Optional[Dict[str, str]] = None) -> web.Application
     init_config(app, config)
     init_logging(app)
     await init_database(app)
+    init_plugins(app)
     init_templates(app)
     init_telegram(app)
-    init_bitbucket(app)
     return app
 
 

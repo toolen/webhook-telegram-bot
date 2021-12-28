@@ -22,4 +22,7 @@ def get_config() -> Dict[str, Any]:
         'DATABASE_ENGINE': 'webhook_telegram_bot.database.backends.mongo',
         'TEMPLATES_DIR': os.path.join(os.path.dirname(__file__), 'templates'),
         'LOG_LEVEL': env.get('LOG_LEVEL', 'DEBUG'),
+        'PLUGINS': [
+            'webhook_telegram_bot.plugins.bitbucket',
+        ],
     }

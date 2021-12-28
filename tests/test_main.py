@@ -15,7 +15,6 @@ from webhook_telegram_bot.helpers import (
 )
 from webhook_telegram_bot.main import (
     create_app,
-    init_bitbucket,
     init_config,
     init_database,
     init_logging,
@@ -154,12 +153,6 @@ async def test_on_cleanup_telegram_handler(aiohttp_server, telegram_server_mock)
     await server.close()
 
     assert not telegram_api.active
-
-
-def test_init_bitbucket():
-    test_app = web.Application()
-    init_config(test_app)
-    init_bitbucket(test_app)
 
 
 async def test_create_app(caplog, aiohttp_server, telegram_server_mock):

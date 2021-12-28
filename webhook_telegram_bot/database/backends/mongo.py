@@ -16,11 +16,11 @@ from webhook_telegram_bot.database.models import Chat
 Document = Dict[str, Union[int, str, List[Dict[str, str]]]]
 
 
-class MongoDatabaseWrapper(BaseDatabaseWrapper):
+class DatabaseWrapper(BaseDatabaseWrapper):
     """This class implements BaseDatabaseWrapper for MongoDB."""
 
     def __init__(self, url: str):
-        """Construct MongoDatabaseWrapper class."""
+        """Construct DatabaseWrapper class."""
         self.client: AgnosticClient = AsyncIOMotorClient(url)
         self.db: AsyncIOMotorDatabase = self.client.get_default_database()
         self.closed = False
