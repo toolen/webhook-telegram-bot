@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 from uuid import uuid4
 
 from aiohttp import web
@@ -43,3 +44,15 @@ def test_send_message_as_response():
     assert data['method'] == 'sendMessage'
     assert 'foo' in data
     assert data['foo'] == 'bar'
+
+
+async def test_send_message(telegram_server_mock):
+    telegram_api_with_mocked_server = TelegramAPI(
+        f'http://localhost:{telegram_server_mock.port}', uuid4().hex
+    )
+    data = await telegram_api_with_mocked_server.send_message(foo="bar")
+    assert data is not None
+    assert isinstance(data, Dict)
+    assert data['method'] == 'POST'
+    assert data['command'] == 'sendMessage'
+    assert data["payload"]['foo'] == 'bar'

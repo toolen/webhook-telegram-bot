@@ -3,7 +3,7 @@ import importlib
 from typing import Any, Dict, List, Optional, Union, cast
 
 from aiohttp import web
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment
 
 from webhook_telegram_bot.database.backends.types import DatabaseWrapperImpl
 from webhook_telegram_bot.plugins.types import AbstractPluginImpl
@@ -126,15 +126,15 @@ def get_db_wrapper_instance(
     return cast(DatabaseWrapperImpl, db_wrapper_class(database_url))
 
 
-def get_prefix_loader_for_plugin(plugin: str) -> Dict[str, PackageLoader]:
-    """
-    Return arguments from plugin to PrefixLoader.
-
-    :param plugin:
-    :return:
-    """
-    key = plugin.split('.').pop()
-    return {key: PackageLoader(plugin, 'templates')}
+# def get_prefix_loader_for_plugin(plugin: str) -> Dict[str, PackageLoader]:
+#     """
+#     Return arguments from plugin to PrefixLoader.
+#
+#     :param plugin:
+#     :return:
+#     """
+#     key = plugin.split('.').pop()
+#     return {key: PackageLoader(plugin, 'templates')}
 
 
 def set_plugins_instances(
@@ -157,4 +157,4 @@ def get_plugins_instances(app: web.Application) -> List[AbstractPluginImpl]:
     :param app:
     :return:
     """
-    return app[PLUGINS_INSTANCES_KEY]
+    return app.get(PLUGINS_INSTANCES_KEY, [])

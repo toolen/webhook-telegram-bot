@@ -1,18 +1,21 @@
 """This file contains application methods."""
 import importlib
 import logging
-from typing import Dict, List, Optional, cast
+from typing import Dict, Optional, cast
 
 from aiohttp import web
 from jinja2 import Environment, PackageLoader, PrefixLoader, select_autoescape
 
 from webhook_telegram_bot.config import get_config
-from webhook_telegram_bot.exceptions import DatabaseUnconfiguredException
+from webhook_telegram_bot.exceptions import (
+    ImproperlyConfiguredException,
+    WebhookBotException,
+)
 from webhook_telegram_bot.helpers import (
     get_config_value,
     get_database,
     get_db_wrapper_instance,
-    get_prefix_loader_for_plugin,
+    get_plugins_instances,
     get_telegram_api,
     set_config,
     set_database,
@@ -74,7 +77,7 @@ async def init_database(app: web.Application) -> None:
         set_database(app, db)
         app.on_cleanup.append(close_database)
     else:
-        raise DatabaseUnconfiguredException()
+        raise ImproperlyConfiguredException()
 
 
 def init_plugins(app: web.Application) -> None:
@@ -87,7 +90,7 @@ def init_plugins(app: web.Application) -> None:
     plugins = get_config_value(app, 'PLUGINS') or []
     plugins_instances = []
     for plugin in plugins:
-        module = importlib.import_module(f'{plugin}.plugin')
+        module = importlib.import_module(f'{plugin}.plugins')
         if hasattr(module, 'Plugin'):
             plugins_instances.append(module.Plugin(app))
     set_plugins_instances(app, plugins_instances)
@@ -103,9 +106,9 @@ def init_templates(app: web.Application) -> None:
     prefix_loader_mapping = {
         'telegram': PackageLoader('webhook_telegram_bot.telegram', 'templates'),
     }
-    for plugin in cast(List[str], get_config_value(app, 'PLUGINS')):
-        mapping = get_prefix_loader_for_plugin(plugin)
-        prefix_loader_mapping.update(**mapping)
+
+    for plugin in get_plugins_instances(app):
+        prefix_loader_mapping.update(plugin.get_package_loader())
 
     template_engine: Environment = Environment(
         loader=PrefixLoader(prefix_loader_mapping),
@@ -131,10 +134,10 @@ def init_telegram(app: web.Application) -> None:
         telegram_api_token = cast(str, get_config_value(app_, 'TELEGRAM_API_TOKEN'))
 
         if not telegram_api_endpoint:
-            raise Exception('TELEGRAM_API_ENDPOINT undefined')
+            raise WebhookBotException('TELEGRAM_API_ENDPOINT undefined')
 
         if not telegram_api_token:
-            raise Exception('TELEGRAM_API_TOKEN undefined')
+            raise WebhookBotException('TELEGRAM_API_TOKEN undefined')
 
         telegram_api = TelegramAPI(
             telegram_api_endpoint,

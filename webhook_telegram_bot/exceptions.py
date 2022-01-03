@@ -7,7 +7,7 @@ class WebhookBotException(Exception):
     pass
 
 
-class DatabaseUnconfiguredException(WebhookBotException):
-    """Exception for unconfigured database."""
+class ImproperlyConfiguredException(WebhookBotException):
+    """Application is somehow improperly configured."""
 
     pass

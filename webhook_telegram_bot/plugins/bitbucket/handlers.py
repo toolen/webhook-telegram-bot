@@ -64,6 +64,6 @@ async def bitbucket_webhook_handler(request: Request) -> web.Response:
                 disable_notification=True,
             )
         except ChatNotFound:
-            logger.error(f'Couldn\'t find chat by webhook_id={webhook_id}')
+            logger.error(f'Failed to find chat by webhook_id={webhook_id}')
 
     return web.Response()

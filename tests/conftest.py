@@ -1,5 +1,6 @@
 import pytest
 from aiohttp import web
+from aiohttp.web_request import Request
 
 from webhook_telegram_bot.config import get_config
 from webhook_telegram_bot.helpers import get_db_wrapper_instance
@@ -23,16 +24,16 @@ async def client(aiohttp_client):
     return await aiohttp_client(app)
 
 
-async def telegram_server_mock_handler(request):
-    # bot_token = request.match_info['bot_token']
-    command = request.match_info['command']
-
-    if command == 'setWebhook':
-        return web.json_response({})
-
-
 @pytest.fixture
 async def telegram_server_mock(aiohttp_server):
+    async def telegram_server_mock_handler(request: Request):
+        # bot_token = request.match_info['bot_token']
+        command = request.match_info['command']
+        payload = await request.json()
+        return web.json_response(
+            {'method': request.method, 'command': command, 'payload': payload}
+        )
+
     app = web.Application()
     app.router.add_post('/{bot_token}/{command}', telegram_server_mock_handler)
     server = await aiohttp_server(app)

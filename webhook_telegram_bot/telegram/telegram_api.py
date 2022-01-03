@@ -29,7 +29,7 @@ class TelegramAPI:
         self.disable_notification = disable_notification
         self.active = False
 
-    async def command(self, command: str, payload: Dict[str, Any]) -> None:
+    async def command(self, command: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
         Send command to Telegram API.
 
@@ -43,6 +43,7 @@ class TelegramAPI:
             async with session.post(url, json=payload, headers=headers) as response:
                 data = await response.json()
                 logger.debug(f'Telegram response: {json.dumps(data)}')
+                return data
 
     async def set_webhook(self, url_webhook: str) -> None:
         """
@@ -63,7 +64,7 @@ class TelegramAPI:
         await self.command('setWebhook', {'url': ''})
         self.active = False
 
-    async def send_message(self, **kwargs: Union[str, int, bool]) -> None:
+    async def send_message(self, **kwargs: Union[str, int, bool]) -> Dict[str, Any]:
         """
         Send text message.
 
@@ -72,7 +73,7 @@ class TelegramAPI:
             text
         :return:
         """
-        await self.command('sendMessage', kwargs)
+        return await self.command('sendMessage', kwargs)
 
     @staticmethod
     def send_message_as_response(

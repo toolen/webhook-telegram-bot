@@ -6,7 +6,7 @@ from jinja2 import Environment
 
 from webhook_telegram_bot.config import get_config as get_default_config
 from webhook_telegram_bot.database.backends.types import DatabaseWrapperImpl
-from webhook_telegram_bot.exceptions import DatabaseUnconfiguredException
+from webhook_telegram_bot.exceptions import ImproperlyConfiguredException
 from webhook_telegram_bot.helpers import (
     get_config,
     get_database,
@@ -55,13 +55,13 @@ async def test_unconfigured_database():
             'DATABASE_URL': None,
         },
     )
-    with pytest.raises(DatabaseUnconfiguredException):
+    with pytest.raises(ImproperlyConfiguredException):
         await init_database(test_app)
     init_config(test_app, {'DATABASE_ENGINE': None})
-    with pytest.raises(DatabaseUnconfiguredException):
+    with pytest.raises(ImproperlyConfiguredException):
         await init_database(test_app)
     init_config(test_app, {'DATABASE_URL': None, 'DATABASE_ENGINE': None})
-    with pytest.raises(DatabaseUnconfiguredException):
+    with pytest.raises(ImproperlyConfiguredException):
         await init_database(test_app)
 
 

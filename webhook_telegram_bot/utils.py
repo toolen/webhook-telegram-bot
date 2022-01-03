@@ -1,4 +1,5 @@
 """This file contains utils methods."""
+from functools import reduce
 from typing import Any, Dict, Optional
 
 
@@ -10,18 +11,16 @@ def deep_get(obj: Optional[Dict[str, Any]], path: str) -> Any:
     :param path:
     :return:
     """
-    accumulator: Any = obj
-    for prop in path.split('.'):
-        if isinstance(accumulator, dict):
-            accumulator = accumulator.get(prop, None)
-        else:
-            accumulator = None
-    return accumulator
+    # accumulator: Any = obj
+    # for prop in path.split('.'):
+    #     if isinstance(accumulator, dict):
+    #         accumulator = accumulator.get(prop, None)
+    #     else:
+    #         accumulator = None
+    # return accumulator
 
-    # return next(
-    #     reduce(
-    #         lambda dict_, attr: dict_.get(attr) if isinstance(dict_, dict) else None,
-    #         path.split('.'),
-    #         obj,
-    #     )
-    # )
+    return reduce(
+        lambda acc, curr: acc.get(curr, None) if isinstance(acc, Dict) else None,
+        path.split('.'),
+        obj,
+    )

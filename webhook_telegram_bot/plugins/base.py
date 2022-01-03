@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
 from aiohttp import web
+from jinja2 import PackageLoader
 
 
 class AbstractPlugin(ABC):
@@ -15,6 +16,25 @@ class AbstractPlugin(ABC):
         :param app:
         """
         super().__init__()
+
+    @abstractmethod
+    def get_package_loader(self) -> Dict[str, PackageLoader]:
+        """
+        Return loader bounded to prefix.
+
+        :return:
+        """
+        pass
+
+    @abstractmethod
+    def is_known_command(self, command: str) -> bool:
+        """
+        Return True if command refers to a plugin.
+
+        :param command:
+        :return:
+        """
+        pass
 
     @abstractmethod
     async def handle_telegram_command(

@@ -6,6 +6,7 @@ from typing import Optional
 from aiohttp import web
 from aiohttp.web_request import Request
 
+from webhook_telegram_bot.exceptions import WebhookBotException
 from webhook_telegram_bot.helpers import (
     get_database,
     get_plugins_instances,
@@ -51,7 +52,7 @@ async def telegram_request_handler(request: Request) -> web.Response:
     chat_id: Optional[int] = telegram_api.get_chat_id(data)
 
     if not text or not chat_id:
-        raise Exception()
+        raise WebhookBotException()
 
     if text == Command.START:
         return await start_command_handler(chat_id, db, telegram_api, template_engine)
@@ -83,12 +84,17 @@ async def telegram_request_handler(request: Request) -> web.Response:
 
     else:
 
-        return await get_response_from_plugins(app, chat_id, text)
+        resp = await get_response_from_plugins(app, chat_id, text)
+        if resp is not None:
+            return resp
+        else:
+            logger.warning(f"Unknown command: {text}")
+            return web.Response()
 
 
 async def get_response_from_plugins(
     app: web.Application, chat_id: int, command: str
-) -> web.Response:
+) -> Optional[web.Response]:
     """
     Return a response from the plugin if the command refers to one of them.
 
@@ -99,7 +105,6 @@ async def get_response_from_plugins(
     """
     plugins_instances = get_plugins_instances(app)
     for plugin_instance in plugins_instances:
-        resp = plugin_instance.handle_telegram_command(app, chat_id, command)
-        if resp:
-            return await resp  # type: ignore
-    return web.Response()
+        if plugin_instance.is_known_command(command):
+            return await plugin_instance.handle_telegram_command(app, chat_id, command)
+    return None
