@@ -2,6 +2,8 @@
 
 BITBUCKET_WEBHOOK_ROUTE = '/api/v1/bitbucket'
 
+BITBUCKET_SERVICE_NAME = 'bitbucket'
+
 BITBUCKET_TEMPLATE_START = 'bitbucket/start.html'
 BITBUCKET_TEMPLATE_BRANCH_CLOSED = 'bitbucket/branch_closed.html'
 BITBUCKET_TEMPLATE_BRANCH_CREATED = 'bitbucket/branch_created.html'

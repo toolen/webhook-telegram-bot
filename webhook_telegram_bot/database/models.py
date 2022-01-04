@@ -1,7 +1,6 @@
 """This file contains independent database models."""
 from __future__ import annotations
 
-from enum import Enum
 from typing import Any, Callable, Generator, List, Optional, Type, Union
 
 from bson import ObjectId
@@ -35,19 +34,11 @@ class PydanticObjectId(ObjectId):  # type: ignore
         return value
 
 
-class Service(str, Enum):
-    """This enum represents services that webhook can relate to."""
-
-    BITBUCKET = 'bitbucket'
-    # github = 'github'
-    # gitlab = 'gitlab'
-
-
 class Webhook(BaseModel):
     """This class represents webhook object."""
 
     webhook_id: str
-    service: Service
+    service: str
     repository_name: Optional[str]
 
     def __hash__(self) -> int:

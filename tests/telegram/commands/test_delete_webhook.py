@@ -2,7 +2,7 @@ import json
 from typing import Dict, List
 from uuid import uuid4
 
-from webhook_telegram_bot.database.models import Chat, Service, Webhook
+from webhook_telegram_bot.database.models import Chat, Webhook
 from webhook_telegram_bot.telegram.commands import Command
 from webhook_telegram_bot.telegram.commands.delete_webhook import (
     delete_webhook_command_handler,
@@ -15,7 +15,7 @@ from .utils import get_db_mock, get_template_engine_mock
 async def test_delete_webhook_command_handler_return_back_button_if_last_webhook_deleted():
     webhook_id = uuid4().hex
     webhook = Webhook(
-        webhook_id=webhook_id, service=Service.BITBUCKET, repository_name='Test'
+        webhook_id=webhook_id, service='bitbucket', repository_name='Test'
     )
     chat = Chat(
         id=1,

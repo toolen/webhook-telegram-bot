@@ -4,7 +4,7 @@ from uuid import uuid4
 
 from first import first
 
-from webhook_telegram_bot.database.models import Chat, Service, Webhook
+from webhook_telegram_bot.database.models import Chat, Webhook
 from webhook_telegram_bot.telegram.commands import Command
 from webhook_telegram_bot.telegram.commands.start import start_command_handler
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
@@ -45,7 +45,7 @@ async def test_start_command_handler_return_edit_webhooks_button():
     chat = Chat(
         id=1,
         chat_id=1,
-        webhooks=[Webhook(webhook_id=webhook_id, service=Service.BITBUCKET)],
+        webhooks=[Webhook(webhook_id=webhook_id, service='bitbucket')],
     )
     db = get_db_mock(chat)
     telegram_api = TelegramAPI("", "")

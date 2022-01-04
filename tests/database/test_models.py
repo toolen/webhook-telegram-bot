@@ -7,13 +7,13 @@ from bson import ObjectId
 from first import first
 from pydantic import ValidationError
 
-from webhook_telegram_bot.database.models import Chat, Service, Webhook
+from webhook_telegram_bot.database.models import Chat, Webhook
 
 
 def test_create_chat_model_with_repository():
     webhook_id = uuid4().hex
     chat_id = 1
-    webhook = Webhook(webhook_id=webhook_id, service=Service.BITBUCKET)
+    webhook = Webhook(webhook_id=webhook_id, service='bitbucket')
     chat = Chat(chat_id=chat_id, webhooks=[webhook])
     assert isinstance(chat, Chat)
     assert chat.id is None
@@ -27,7 +27,7 @@ def test_create_chat_model_with_repository():
 def test_serialize_chat_model_with_repository_to_dict():
     webhook_id = uuid4().hex
     chat_id = 1
-    webhook = Webhook(webhook_id=webhook_id, service=Service.BITBUCKET)
+    webhook = Webhook(webhook_id=webhook_id, service='bitbucket')
     chat = Chat(chat_id=chat_id, webhooks=[webhook])
 
     chat_dict = chat.dict()
@@ -44,7 +44,7 @@ def test_serialize_chat_model_with_repository_to_dict():
 def test_serialize_chat_model_with_repository_to_json():
     webhook_id = uuid4().hex
     chat_id = 1
-    webhook = Webhook(webhook_id=webhook_id, service=Service.BITBUCKET)
+    webhook = Webhook(webhook_id=webhook_id, service='bitbucket')
     chat = Chat(chat_id=chat_id, webhooks=[webhook])
 
     chat_json = chat.json()
@@ -61,7 +61,7 @@ def test_serialize_chat_model_with_repository_to_json():
 def test_deserialize_chat_model_with_repository_from_mongo_dict():
     webhook_id = uuid4().hex
     chat_id = 1
-    webhook = Webhook(webhook_id=webhook_id, service=Service.BITBUCKET)
+    webhook = Webhook(webhook_id=webhook_id, service='bitbucket')
     chat = Chat(chat_id=chat_id, webhooks=[webhook])
 
     chat_dict = chat.dict()
@@ -81,7 +81,7 @@ def test_deserialize_chat_model_with_repository_from_mongo_dict():
 def test_deserialize_chat_model_with_repository_from_rdb_dict():
     webhook_id = uuid4().hex
     chat_id = 1
-    webhook = Webhook(webhook_id=webhook_id, service=Service.BITBUCKET)
+    webhook = Webhook(webhook_id=webhook_id, service='bitbucket')
     chat = Chat(chat_id=chat_id, webhooks=[webhook])
 
     chat_dict = chat.dict()
@@ -106,8 +106,8 @@ def test_chat_id_validation():
 
 
 def test_webhook_equality():
-    webhook_a = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
-    webhook_b = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
+    webhook_a = Webhook(webhook_id=uuid4().hex, service='bitbucket')
+    webhook_b = Webhook(webhook_id=uuid4().hex, service='bitbucket')
     assert webhook_a == webhook_a
     assert webhook_a != webhook_b
     assert webhook_a != Mock()
@@ -115,8 +115,8 @@ def test_webhook_equality():
 
 def test_get_webhook_by_id():
     webhook_b_id = uuid4().hex
-    webhook_a = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
-    webhook_b = Webhook(webhook_id=webhook_b_id, service=Service.BITBUCKET)
+    webhook_a = Webhook(webhook_id=uuid4().hex, service='bitbucket')
+    webhook_b = Webhook(webhook_id=webhook_b_id, service='bitbucket')
     chat = Chat(chat_id=1, webhooks=[webhook_a, webhook_b])
 
     webhook = chat.get_webhook_by_id(webhook_b_id)
@@ -134,8 +134,8 @@ def test_get_webhook_by_id_returns_none():
 
 
 def test_set_webhook_repository_name():
-    webhook_a = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
-    webhook_b = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
+    webhook_a = Webhook(webhook_id=uuid4().hex, service='bitbucket')
+    webhook_b = Webhook(webhook_id=uuid4().hex, service='bitbucket')
     chat = Chat(chat_id=1, webhooks=[webhook_a, webhook_b])
 
     repository_name = uuid4().hex
@@ -146,8 +146,8 @@ def test_set_webhook_repository_name():
 
 
 def test_delete_webhook_by_id():
-    webhook_a = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
-    webhook_b = Webhook(webhook_id=uuid4().hex, service=Service.BITBUCKET)
+    webhook_a = Webhook(webhook_id=uuid4().hex, service='bitbucket')
+    webhook_b = Webhook(webhook_id=uuid4().hex, service='bitbucket')
     chat = Chat(chat_id=1, webhooks=[webhook_a, webhook_b])
 
     chat.delete_webhook_by_id(webhook_b.webhook_id)

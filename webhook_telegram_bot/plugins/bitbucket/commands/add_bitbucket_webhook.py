@@ -6,9 +6,10 @@ from jinja2 import Environment
 
 from webhook_telegram_bot.database.backends.types import DatabaseWrapperImpl
 from webhook_telegram_bot.database.exceptions import ChatNotFound
-from webhook_telegram_bot.database.models import Chat, Service, Webhook
+from webhook_telegram_bot.database.models import Chat, Webhook
 from webhook_telegram_bot.helpers import get_config_value
 from webhook_telegram_bot.plugins.bitbucket.constants import (
+    BITBUCKET_SERVICE_NAME,
     BITBUCKET_TEMPLATE_START,
     BITBUCKET_WEBHOOK_ROUTE,
 )
@@ -35,7 +36,7 @@ async def add_bitbucket_webhook_command_handler(
     """
     telegram_webhook_host = get_config_value(app, 'TELEGRAM_WEBHOOK_HOST')
     webhook_id: str = uuid.uuid4().hex
-    webhook: Webhook = Webhook(webhook_id=webhook_id, service=Service.BITBUCKET)
+    webhook: Webhook = Webhook(webhook_id=webhook_id, service=BITBUCKET_SERVICE_NAME)
 
     try:
         chat = await db.get_chat_by_chat_id(chat_id)

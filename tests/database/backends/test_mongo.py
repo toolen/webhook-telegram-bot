@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorCollection
 
 from webhook_telegram_bot.database.backends.types import DatabaseWrapperImpl
 from webhook_telegram_bot.database.exceptions import ChatNotFound
-from webhook_telegram_bot.database.models import Chat, Service, Webhook
+from webhook_telegram_bot.database.models import Chat, Webhook
 
 
 async def test_get_chat_by_chat_id(db_wrapper: DatabaseWrapperImpl):
@@ -34,7 +34,7 @@ async def test_get_chat_by_repository_id(db_wrapper: DatabaseWrapperImpl):
     await collection.insert_one(
         {
             'chat_id': chat_id,
-            'webhooks': [{'webhook_id': webhook_id, 'service': Service.BITBUCKET}],
+            'webhooks': [{'webhook_id': webhook_id, 'service': 'bitbucket'}],
         }
     )
 
@@ -46,7 +46,7 @@ async def test_get_chat_by_repository_id(db_wrapper: DatabaseWrapperImpl):
 
 async def test_save_chat(db_wrapper: DatabaseWrapperImpl):
     webhook_id = uuid4().hex
-    webhook = Webhook(webhook_id=webhook_id, service=Service.BITBUCKET)
+    webhook = Webhook(webhook_id=webhook_id, service='bitbucket')
     chat_id = 1
     chat = Chat(chat_id=chat_id, webhooks=[webhook])
 
@@ -59,7 +59,7 @@ async def test_save_chat(db_wrapper: DatabaseWrapperImpl):
 
 async def test_update_chat(db_wrapper: DatabaseWrapperImpl):
     webhook_id = uuid4().hex
-    webhook = Webhook(webhook_id=webhook_id, service=Service.BITBUCKET)
+    webhook = Webhook(webhook_id=webhook_id, service='bitbucket')
     chat_id = 1
     chat = Chat(chat_id=chat_id, webhooks=[webhook])
 
@@ -67,7 +67,7 @@ async def test_update_chat(db_wrapper: DatabaseWrapperImpl):
     created_chat_id = created_chat.id
 
     another_webhook_id = uuid4().hex
-    another_webhook = Webhook(webhook_id=another_webhook_id, service=Service.BITBUCKET)
+    another_webhook = Webhook(webhook_id=another_webhook_id, service='bitbucket')
     created_chat.webhooks.append(another_webhook)
     updated_chat = await db_wrapper.save_chat(created_chat)
 
