@@ -1,15 +1,38 @@
-FROM python:3.9.5-slim-buster
+FROM python:3.9.9-slim-bullseye@sha256:615ceb9962b182726198d4e71c1b8ecfa4904f83957fb8f4742e573e18e990f7 AS builder
 
 LABEL maintainer="dmitrii@zakharov.cc"
 
 ENV \
-    # Tell apt-get we're never going to be able to give manual feedback:
     DEBIAN_FRONTEND=noninteractive \
-    # build:
-    BUILD_ONLY_PACKAGES='wget' \
     # python:
     PYTHONFAULTHANDLER=1 \
-    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random \
+    PYTHONDONTWRITEBYTECODE=1 \
+    # pip:
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    # poetry:
+    POETRY_VERSION=1.1.12 \
+    POETRY_NO_INTERACTION=1 \
+    POETRY_VIRTUALENVS_CREATE=true \
+    POETRY_CACHE_DIR='/var/cache/pypoetry' \
+    PATH="$PATH:/root/.local/bin"
+
+RUN pip install --no-cache-dir poetry==$POETRY_VERSION
+
+WORKDIR /code
+
+COPY ./poetry.lock ./pyproject.toml /code/
+
+RUN poetry export --no-ansi --no-interaction > requirements.txt
+
+FROM python:3.9.9-alpine3.15@sha256:ce36ba64436cc423fec8b27ac41875e36b0d977cc85594a4cab021ee3378a1c8 AS runner
+
+ENV \
+    TIME_ZONE=Europe/Moscow \
+    # python:
+    PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random \
     PYTHONDONTWRITEBYTECODE=1 \
     # pip:
@@ -18,53 +41,37 @@ ENV \
     PIP_DEFAULT_TIMEOUT=100 \
     # tini:
     TINI_VERSION=v0.19.0 \
-    # poetry:
-    POETRY_VERSION=1.1.5 \
-    POETRY_NO_INTERACTION=1 \
-    POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_CACHE_DIR='/var/cache/pypoetry' \
-    PATH="$PATH:/root/.poetry/bin" \
+    # gunicorn
+    GUNICORN_CMD_ARGS=""
 
-# System deps:
+RUN apk add --no-cache \
+#        curl==7.80.0-r0 \
+        tini==0.19.0-r0 \
+    && cp /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime \
+    && echo "${TIME_ZONE}" > /etc/timezone \
+    && date \
+    && addgroup -g 1000 -S app \
+    && adduser -h /app -G app -S -u 1000 app
+
+COPY --chown=app:app --from=builder /code/requirements.txt /app
+
+WORKDIR /app
+
+USER app
+
 RUN set -ex \
-    # Update the package listing, so we know what package exist:
-    && apt-get update \
-    # Install security updates:
-    && apt-get -y upgrade \
-    # Install a new package, without unnecessary recommended packages:
-    && apt-get install --no-install-recommends -y \
-        # Defining build-time-only dependencies:
-        $BUILD_ONLY_PACKAGES \
-    # Installing `tini` utility:
-    # https://github.com/krallin/tini
-    && wget "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini" \
-    && wget "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini.sha256sum" \
-    && sha256sum -c tini.sha256sum \
-    && mv tini /usr/local/bin/tini \
-    && chmod +x /usr/local/bin/tini \
-    # Installing `poetry` package manager:
-    # https://github.com/python-poetry/poetry
-    && pip install --no-cache-dir poetry==${POETRY_VERSION} \
-    # Removing build-time-only dependencies:
-    && apt-get remove -y $BUILD_ONLY_PACKAGES \
-    # Cleaning cache:
-    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-    && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf tini.sha256sum \
-    # Setting up proper permissions:
-    && groupadd -r repository-telegram-bot \
-    && useradd -d /srv/repository-telegram-bot -r -g repository-telegram-bot repository-telegram-bot
+    && python -m venv venv \
+    && venv/bin/pip install --no-cache-dir --require-hashes -r requirements.txt
 
-COPY --chown=repository-telegram-bot:repository-telegram-bot ./poetry.lock ./pyproject.toml /srv/repository-telegram-bot/
+COPY ./webhook_telegram_bot /app/webhook_telegram_bot
 
-WORKDIR /srv/repository-telegram-bot
-
-# Install dependecies:
-RUN poetry install --no-dev --no-interaction --no-ansi \
-    && rm -rf "$POETRY_CACHE_DIR"
-
-COPY --chown=repository-telegram-bot:repository-telegram-bot . .
-
-# Running as non-root user:
-USER repository-telegram-bot
+CMD [ "/sbin/tini", "--", \
+"/app/venv/bin/gunicorn", \
+"--worker-tmp-dir", "/dev/shm", \
+"--worker-class", "aiohttp.worker.GunicornWebWorker", \
+"--workers=2", \
+"--threads=4", \
+"--log-file=-", \
+"--chdir", "/app", \
+"--bind", "0.0.0.0:8080", \
+"webhook_telegram_bot.main:create_app"]
