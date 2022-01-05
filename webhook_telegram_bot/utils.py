@@ -7,18 +7,10 @@ def deep_get(obj: Optional[Dict[str, Any]], path: str) -> Any:
     """
     Return value from dict by string path or None.
 
-    :param obj:
-    :param path:
-    :return:
+    :param obj: dictionary
+    :param path: string of dictionary properties separated by dots
+    :return: value or None
     """
-    # accumulator: Any = obj
-    # for prop in path.split('.'):
-    #     if isinstance(accumulator, dict):
-    #         accumulator = accumulator.get(prop, None)
-    #     else:
-    #         accumulator = None
-    # return accumulator
-
     return reduce(
         lambda acc, curr: acc.get(curr, None) if isinstance(acc, Dict) else None,
         path.split('.'),

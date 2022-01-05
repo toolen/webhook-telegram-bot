@@ -68,8 +68,8 @@ class Chat(BaseModel):
         """
         Return Webhook object by webhook_id.
 
-        :param webhook_id:
-        :return:
+        :param webhook_id: chat identification string
+        :return: Webhook instance or None
         """
         for webhook in self.webhooks:
             if webhook.webhook_id == webhook_id:
@@ -80,9 +80,9 @@ class Chat(BaseModel):
         """
         Set webhook repository_name.
 
-        :param webhook_id:
-        :param name:
-        :return:
+        :param webhook_id: chat identification string
+        :param name: repository name
+        :return: None
         """
         for webhook in self.webhooks:
             if webhook.webhook_id == webhook_id:
@@ -92,8 +92,8 @@ class Chat(BaseModel):
         """
         Exclude webhook from webhooks list by id.
 
-        :param webhook_id:
-        :return:
+        :param webhook_id: chat identification string
+        :return: None
         """
         self.webhooks = list(
             filter(lambda x: x.webhook_id != webhook_id, self.webhooks)

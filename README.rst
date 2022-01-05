@@ -4,9 +4,9 @@ webhook-telegram-bot
     :target: https://github.com/toolen/webhook-telegram-bot/actions/workflows/ci.yaml
     :alt: CI Status
 
-Telegram bot for handling webhook requests.
+Telegram bot for handling webhooks.
 
-Supported repositories
+Supported webhooks
 ======================
 
 Bitbucket

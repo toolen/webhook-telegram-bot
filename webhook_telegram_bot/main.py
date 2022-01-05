@@ -36,9 +36,9 @@ def init_config(
     """
     Initialize application configuration.
 
-    :param app:
-    :param override_config:
-    :return:
+    :param app: application instance
+    :param override_config: dictionary that override config
+    :return: None
     """
     config = get_config()
     if override_config:
@@ -50,8 +50,8 @@ def init_logging(app: web.Application) -> None:
     """
     Initialize application logging.
 
-    :param app:
-    :return:
+    :param app: application instance
+    :return: None
     """
     log_level = cast(str, get_config_value(app, 'LOG_LEVEL'))
     logging.basicConfig(level=log_level)
@@ -62,11 +62,17 @@ async def init_database(app: web.Application) -> None:
     """
     Initialize application database.
 
-    :param app:
-    :return:
+    :param app: application instance
+    :return: None
     """
 
     async def close_database(app_: web.Application) -> None:
+        """
+        Close database connection on application shutdown.
+
+        :param app_: application instance
+        :return: None
+        """
         db_ = get_database(app_)
         db_.close()
 
@@ -84,8 +90,8 @@ def init_plugins(app: web.Application) -> None:
     """
     Initialize application plugins.
 
-    :param app:
-    :return:
+    :param app: application instance
+    :return: None
     """
     plugins = get_config_value(app, 'PLUGINS') or []
     plugins_instances = []
@@ -100,8 +106,8 @@ def init_templates(app: web.Application) -> None:
     """
     Initialize application template engine.
 
-    :param app:
-    :return:
+    :param app: application instance
+    :return: None
     """
     prefix_loader_mapping = {
         'telegram': PackageLoader('webhook_telegram_bot.telegram', 'templates'),
@@ -123,8 +129,8 @@ def init_telegram(app: web.Application) -> None:
     """
     Initialize Telegram package.
 
-    :param app:
-    :return:
+    :param app: application instance
+    :return: None
     """
 
     async def on_startup_telegram_handler(app_: web.Application) -> None:
@@ -163,7 +169,8 @@ async def create_app(config: Optional[Dict[str, str]] = None) -> web.Application
     """
     Create application.
 
-    :return:
+    :param config: application configuration
+    :return: application instance
     """
     app: web.Application = web.Application()
     init_config(app, config)
@@ -179,7 +186,7 @@ def main() -> None:
     """
     Startup application.
 
-    :return:
+    :return: None
     """
     app = create_app()
     web.run_app(app, host='localhost', port=8080)

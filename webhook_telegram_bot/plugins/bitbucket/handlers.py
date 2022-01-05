@@ -23,8 +23,8 @@ async def bitbucket_webhook_handler(request: Request) -> web.Response:
     """
     Process webhook request.
 
-    :param request:
-    :return:
+    :param request: request from Telegram API
+    :return: response from bot
     """
     webhook_id = request.match_info.get('webhook_id')
     event_key: Optional[str] = request.headers.get('X-Event-Key')

@@ -34,8 +34,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         Return collection by name.
 
-        :param collection_name:
-        :return:
+        :param collection_name: name of mongodb collection
+        :return: instance of collection wrapper
         """
         return self.db[collection_name]
 
@@ -47,8 +47,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         Return chat object by id.
 
-        :param chat_id:
-        :return:
+        :param chat_id: chat identification number
+        :return: Chat instance
         """
         document_filter = {'chat_id': chat_id}
         collection: AsyncIOMotorCollection = self.get_collection('chats')
@@ -63,8 +63,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         Return chat object by webhook id.
 
-        :param webhook_id:
-        :return:
+        :param webhook_id: webhook identification string
+        :return: Chat instance
         """
         document_filter = {'webhooks.webhook_id': webhook_id}
         collection: AsyncIOMotorCollection = self.get_collection('chats')
@@ -79,8 +79,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         Save chat object to database.
 
-        :param chat:
-        :return:
+        :param chat: Chat instance
+        :return: Chat instance
         """
         collection: AsyncIOMotorCollection = self.get_collection('chats')
         chat_as_dict = chat.dict()

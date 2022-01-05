@@ -13,7 +13,7 @@ class AbstractPlugin(ABC):
         """
         Determine constructor signature.
 
-        :param app:
+        :param app: application instance
         """
         super().__init__()
 
@@ -22,7 +22,7 @@ class AbstractPlugin(ABC):
         """
         Return loader bounded to prefix.
 
-        :return:
+        :return: dict of loaders where each loader is bound to a prefix
         """
         pass
 
@@ -31,8 +31,8 @@ class AbstractPlugin(ABC):
         """
         Return True if command refers to a plugin.
 
-        :param command:
-        :return:
+        :param command: incoming text from Telegram chat
+        :return: True if command refers to a plugin.
         """
         pass
 
@@ -43,10 +43,10 @@ class AbstractPlugin(ABC):
         """
         Abstract method to override.
 
-        :param app:
-        :param chat_id:
-        :param command:
-        :return:
+        :param app: application instance
+        :param chat_id: chat identification number
+        :param command: incoming text from Telegram chat
+        :return: bot response
         """
         pass
 
@@ -55,6 +55,6 @@ class AbstractPlugin(ABC):
         """
         Abstract method to override.
 
-        :return:
+        :return: inline keyboard structure
         """
         pass

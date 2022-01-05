@@ -24,7 +24,7 @@ class Plugin(AbstractPlugin):
         """
         Construct Plugin object.
 
-        :param app:
+        :param app: application instance
         """
         init_bitbucket_routes(app)
         super().__init__(app)
@@ -33,7 +33,7 @@ class Plugin(AbstractPlugin):
         """
         Return loader bounded to prefix.
 
-        :return:
+        :return: dict of loaders where each loader is bound to a prefix
         """
         return {'bitbucket': PackageLoader('webhook_telegram_bot.plugins.bitbucket')}
 
@@ -41,8 +41,8 @@ class Plugin(AbstractPlugin):
         """
         Return True if command refers to a plugin.
 
-        :param command:
-        :return:
+        :param command: incoming text from Telegram chat
+        :return: True if command refers to a plugin.
         """
         for command_item in BitbucketCommand:
             if command == command_item.value:
@@ -55,10 +55,10 @@ class Plugin(AbstractPlugin):
         """
         Handle commands from telegram.
 
-        :param app:
-        :param chat_id:
-        :param command:
-        :return:
+        :param app: application instance
+        :param chat_id: chat identification number
+        :param command: incoming text from Telegram chat
+        :return: bot response
         """
         if command == BitbucketCommand.ADD_BITBUCKET_WEBHOOK:
             telegram_api = get_telegram_api(app)
@@ -73,7 +73,7 @@ class Plugin(AbstractPlugin):
         """
         Return code for inline keyboard.
 
-        :return:
+        :return: inline keyboard structure
         """
         return [
             {

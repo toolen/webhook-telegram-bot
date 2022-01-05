@@ -9,7 +9,7 @@ def get_config() -> Dict[str, Any]:
     """
     Return application config.
 
-    :return:
+    :return: application configuration
     """
     return {
         'DEBUG': True,

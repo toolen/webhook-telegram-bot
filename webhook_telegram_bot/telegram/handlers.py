@@ -35,8 +35,8 @@ async def telegram_request_handler(request: Request) -> web.Response:
     """
     Handle Telegram requests.
 
-    :param request:
-    :return:
+    :param request: request from Telegram API
+    :return: bot response
     """
     data = await request.json()
 
@@ -98,10 +98,10 @@ async def get_response_from_plugins(
     """
     Return a response from the plugin if the command refers to one of them.
 
-    :param app:
-    :param chat_id:
-    :param command:
-    :return:
+    :param app: application instance
+    :param chat_id: chat identification number
+    :param command: incoming text from Telegram chat
+    :return: bot response or None
     """
     plugins_instances = get_plugins_instances(app)
     for plugin_instance in plugins_instances:

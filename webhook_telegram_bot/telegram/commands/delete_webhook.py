@@ -23,12 +23,12 @@ async def delete_webhook_command_handler(
     """
     Return message about webhook deletion.
 
-    :param chat_id:
-    :param webhook_id:
-    :param db:
-    :param telegram_api:
-    :param template_engine:
-    :return:
+    :param chat_id: chat identification number
+    :param webhook_id: chat identification string
+    :param db: DatabaseWrapper implementation instance
+    :param telegram_api: TelegramAPI instance
+    :param template_engine: template engine instance
+    :return: bot response
     """
     try:
         chat: Chat = await db.get_chat_by_chat_id(chat_id)

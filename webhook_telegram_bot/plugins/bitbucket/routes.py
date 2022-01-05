@@ -9,8 +9,8 @@ def init_bitbucket_routes(app: web.Application) -> None:
     """
     Initialize Bitbucket module routes.
 
-    :param app:
-    :return:
+    :param app: application instance
+    :return: None
     """
     app.add_routes(
         [

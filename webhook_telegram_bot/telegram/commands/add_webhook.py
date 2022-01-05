@@ -18,11 +18,11 @@ async def add_webhook_command_handler(
     """
     Return list of supported services.
 
-    :param chat_id:
-    :param telegram_api:
-    :param template_engine:
-    :param plugins_menu_buttons:
-    :return:
+    :param chat_id: chat identification number
+    :param telegram_api: TelegramAPI instance
+    :param template_engine: template engine instance
+    :param plugins_menu_buttons: list of inline keyboard structures
+    :return: bot response
     """
     template = template_engine.get_template(TELEGRAM_TEMPLATE_SELECT_SERVICE)
     text = template.render()

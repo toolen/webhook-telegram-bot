@@ -27,7 +27,7 @@ class EventProcessor(ABC):
         """
         Return display name of event actor.
 
-        :return:
+        :return: display name of event actor or None
         """
         return cast(str, deep_get(self.json_data, 'actor.display_name'))
 
@@ -36,7 +36,7 @@ class EventProcessor(ABC):
         """
         Return repository name.
 
-        :return:
+        :return: repository name or None
         """
         return cast(str, deep_get(self.json_data, 'repository.name'))
 
@@ -45,7 +45,7 @@ class EventProcessor(ABC):
         """
         Return repository href.
 
-        :return:
+        :return: repository href or None
         """
         return cast(str, deep_get(self.json_data, 'repository.links.html.href'))
 
@@ -56,7 +56,7 @@ class EventProcessor(ABC):
         """
         Return template name with render context.
 
-        :return:
+        :return: tuple of template name and render context
         """
         pass
 
@@ -68,9 +68,10 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Construct RepositoryEventProcessor class.
 
-        :param entity:
-        :param action:
-        :param json_data:
+        :param entity: subject of webhook event
+        :param action: action with subject of webhook event
+        :param json_data: JSON of webhook event
+        :return: None
         """
         self.entity = entity
         self.action = action
@@ -81,7 +82,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return dict of changes.
 
-        :return:
+        :return: dict of changes or None
         """
         changes = deep_get(self.json_data, 'push.changes') or []
         return first(changes)
@@ -91,7 +92,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return branch name.
 
-        :return:
+        :return: branch name or None
         """
         return cast(
             str,
@@ -103,7 +104,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return hyperlink to branch.
 
-        :return:
+        :return: branch href or None
         """
         return cast(
             str,
@@ -116,7 +117,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return True if branch was created.
 
-        :return:
+        :return: True if branch was created, False if not, None if failed to get
         """
         return cast(bool, deep_get(self.changes, 'created'))
 
@@ -125,7 +126,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return True if branch was closed.
 
-        :return:
+        :return: True if branch was closed, False if not, None if failed to get
         """
         return cast(bool, deep_get(self.changes, 'closed'))
 
@@ -134,7 +135,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return pipeline title.
 
-        :return:
+        :return: pipeline title or None
         """
         return cast(str, deep_get(self.json_data, 'commit_status.name'))
 
@@ -143,7 +144,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return pipeline state.
 
-        :return:
+        :return: pipeline state: 'STARTED', 'FINISHED', 'FAILED' or None
         """
         state = cast(str, deep_get(self.json_data, 'commit_status.state'))
         if state == 'INPROGRESS':
@@ -158,7 +159,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return href to pipeline.
 
-        :return:
+        :return: href to pipeline or None
         """
         return cast(str, deep_get(self.json_data, 'commit_status.url'))
 
@@ -167,7 +168,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return a tuple of number of commits and bool determines whether there were more than 5 commits.
 
-        :return:
+        :return: tuple of number of commits and bool determines whether there were more than 5 commits.
         """
         changes = self.changes or {}
         return len(changes.get('commits', [])), cast(
@@ -178,8 +179,8 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return commit description.
 
-        :param commit:
-        :return:
+        :param commit: dictionary of information about commit
+        :return: commit description
         """
         description = cast(str, deep_get(commit, 'summary.raw'))
         return description.strip() if description else description
@@ -188,8 +189,8 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return hyperlink to comment.
 
-        :param commit:
-        :return:
+        :param commit: dictionary of information about commit
+        :return: commit href
         """
         return cast(str, deep_get(commit, 'links.html.href'))
 
@@ -197,7 +198,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return render context.
 
-        :return:
+        :return: render context
         """
         number_of_commits, is_number_of_commits_truncated = self.number_of_commits
         return {
@@ -219,7 +220,7 @@ class RepositoryEventProcessor(EventProcessor):
         """
         Return template name with render context.
 
-        :return:
+        :return: tuple of template name with render context.
         """
         context = self.get_context()
         if self.action == 'push':
@@ -244,9 +245,10 @@ class PullRequestEventProcessor(EventProcessor):
         """
         Construct PullRequestEventProcessor class.
 
-        :param entity:
-        :param action:
-        :param json_data:
+        :param entity: subject of webhook event
+        :param action: action with subject of webhook event
+        :param json_data: JSON of webhook event
+        :return: None
         """
         self.entity = entity
         self.action = action
@@ -257,7 +259,7 @@ class PullRequestEventProcessor(EventProcessor):
         """
         Return pull request id.
 
-        :return:
+        :return: pull request id or None
         """
         return cast(int, deep_get(self.json_data, 'pullrequest.id'))
 
@@ -266,7 +268,7 @@ class PullRequestEventProcessor(EventProcessor):
         """
         Return pull request title.
 
-        :return:
+        :return: pull request title or None
         """
         return cast(str, deep_get(self.json_data, 'pullrequest.title'))
 
@@ -275,7 +277,7 @@ class PullRequestEventProcessor(EventProcessor):
         """
         Return hyperlink to pull request.
 
-        :return:
+        :return: href to pull request or None
         """
         return cast(str, deep_get(self.json_data, 'pullrequest.links.html.href'))
 
@@ -283,7 +285,7 @@ class PullRequestEventProcessor(EventProcessor):
         """
         Return render context.
 
-        :return:
+        :return: render context
         """
         return {
             'repository_name': self.repository_name,
@@ -300,7 +302,7 @@ class PullRequestEventProcessor(EventProcessor):
         """
         Return template name with render context.
 
-        :return:
+        :return: tuple of template name and render context.
         """
         return BITBUCKET_TEMPLATE_PULL_REQUEST_EVENT, self.get_context()
 
@@ -312,9 +314,10 @@ class UnknownEventProcessor(EventProcessor):
         """
         Construct UnknownEventProcessor class.
 
-        :param entity:
-        :param action:
-        :param json_data:
+        :param entity: subject of webhook event
+        :param action: action with subject of webhook event
+        :param json_data: JSON of webhook event
+        :return: None
         """
         self.entity = entity
         self.action = action
@@ -324,7 +327,7 @@ class UnknownEventProcessor(EventProcessor):
         """
         Return template name with render context.
 
-        :return:
+        :return: tuple of template name and render context
         """
         return BITBUCKET_TEMPLATE_UNKNOWN_EVENT, {
             'repository_name': self.repository_name,
@@ -339,8 +342,9 @@ class BitbucketEventProcessor:
         """
         Construct BitbucketEventProcessor class.
 
-        :param event_key:
-        :param json_data:
+        :param event_key: subject and action of webhook event delimited by ":"
+        :param json_data: JSON of webhook event
+        :return: None
         """
         self.entity, self.action = event_key.split(':')
         self.json_data = json_data
@@ -349,7 +353,7 @@ class BitbucketEventProcessor:
         """
         Return True if event come from repository.
 
-        :return:
+        :return: True if event come from repository.
         """
         return self.entity == 'repo'
 
@@ -357,7 +361,7 @@ class BitbucketEventProcessor:
         """
         Return True if event come from pull request.
 
-        :return:
+        :return: True if event come from pull request.
         """
         return self.entity == 'pullrequest'
 
@@ -369,7 +373,7 @@ class BitbucketEventProcessor:
         """
         Return event processor instance.
 
-        :return:
+        :return: event processor instance.
         """
         constructor_args = (self.entity, self.action, self.json_data)
         if self._is_repository_event():
@@ -385,7 +389,7 @@ class BitbucketEventProcessor:
         """
         Return template name with render context.
 
-        :return:
+        :return: tuple of template name and render context.
         """
         event_processor = self.get_event_processor()
         return event_processor.get_template_name_with_context()

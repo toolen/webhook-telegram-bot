@@ -9,8 +9,8 @@ def init_telegram_routes(app: web.Application) -> None:
     """
     Initialize Telegram routes.
 
-    :param app:
-    :return:
+    :param app: application instance
+    :return: None
     """
     app.add_routes(
         [

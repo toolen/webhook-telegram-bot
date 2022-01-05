@@ -21,11 +21,11 @@ async def edit_webhooks_command_handler(
     """
     Return list of webhooks associated with the chat.
 
-    :param chat_id:
-    :param db:
-    :param telegram_api:
-    :param template_engine:
-    :return:
+    :param chat_id: chat identification number
+    :param db: DatabaseWrapper implementation instance
+    :param telegram_api: TelegramAPI instance
+    :param template_engine: template engine instance
+    :return: bot response
     """
     try:
         template = template_engine.get_template(TELEGRAM_TEMPLATE_EDIT_WEBHOOKS)

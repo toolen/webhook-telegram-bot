@@ -16,11 +16,11 @@ async def edit_webhook_command_handler(
     """
     Return list of action with selected webhook.
 
-    :param chat_id:
-    :param webhook_id:
-    :param telegram_api:
-    :param template_engine:
-    :return:
+    :param chat_id: chat identification number
+    :param webhook_id: chat identification string
+    :param telegram_api: TelegramAPI instance
+    :param template_engine: template engine instance
+    :return: bot response
     """
     template = template_engine.get_template(TELEGRAM_TEMPLATE_EDIT_WEBHOOK)
     text = template.render()

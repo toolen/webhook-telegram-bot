@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class TelegramAPI:
-    """This class helps with Telegram API."""
+    """This class wraps Telegram API."""
 
     def __init__(
         self, telegram_api_endpoint: str, token: str, disable_notification: bool = True
@@ -20,9 +20,10 @@ class TelegramAPI:
         """
         Construct TelegramAPI class.
 
-        :param telegram_api_endpoint:
-        :param token:
-        :param disable_notification:
+        :param telegram_api_endpoint: Telegram server url
+        :param token: token of Telegram bot
+        :param disable_notification: send message in silent mode
+        :return: None
         """
         self.telegram_api_endpoint = telegram_api_endpoint
         self.token = token
@@ -33,9 +34,9 @@ class TelegramAPI:
         """
         Send command to Telegram API.
 
-        :param command:
-        :param payload:
-        :return:
+        :param command: any command to Telegram API
+        :param payload: payload of command
+        :return: response data of Telegram server
         """
         headers = {'Content-Type': 'application/json'}
         async with aiohttp.ClientSession() as session:
@@ -49,8 +50,8 @@ class TelegramAPI:
         """
         Set webhook.
 
-        :param url_webhook:
-        :return:
+        :param url_webhook: https url where telegram will send updates to bot
+        :return: None
         """
         await self.command('setWebhook', {'url': url_webhook})
         self.active = True
@@ -59,7 +60,7 @@ class TelegramAPI:
         """
         Delete webhook.
 
-        :return:
+        :return: None
         """
         await self.command('setWebhook', {'url': ''})
         self.active = False
@@ -71,7 +72,7 @@ class TelegramAPI:
         :param kwargs:
             chat_id
             text
-        :return:
+        :return: response data of Telegram server
         """
         return await self.command('sendMessage', kwargs)
 

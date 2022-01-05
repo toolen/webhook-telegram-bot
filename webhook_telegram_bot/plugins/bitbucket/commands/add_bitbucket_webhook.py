@@ -27,12 +27,12 @@ async def add_bitbucket_webhook_command_handler(
     """
     Return webhook for Bitbucket repository.
 
-    :param app:
-    :param chat_id:
-    :param db:
-    :param telegram_api:
-    :param template_engine:
-    :return:
+    :param app: application instance
+    :param chat_id: chat identification number
+    :param db: DatabaseWrapper implementation instance
+    :param telegram_api: TelegramAPI instance
+    :param template_engine: template engine instance
+    :return: bot response
     """
     telegram_webhook_host = get_config_value(app, 'TELEGRAM_WEBHOOK_HOST')
     webhook_id: str = uuid.uuid4().hex

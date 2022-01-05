@@ -15,7 +15,7 @@ class BaseDatabaseWrapper(ABC):
         """
         Construct BaseDatabaseWrapper subclasses.
 
-        :param url:
+        :param url: connection url
         """
         pass
 
@@ -42,7 +42,7 @@ class BaseDatabaseWrapper(ABC):
         """
         Return chat by id.
 
-        :param chat_id:
+        :param chat_id: chat identification number
         :return:
         """
         pass
@@ -52,8 +52,8 @@ class BaseDatabaseWrapper(ABC):
         """
         Return chat by webhook id.
 
-        :param webhook_id:
-        :return:
+        :param webhook_id: webhook identification string
+        :return: Chat instance
         """
         pass
 
@@ -62,7 +62,7 @@ class BaseDatabaseWrapper(ABC):
         """
         Save chat object to database.
 
-        :param chat:
-        :return:
+        :param chat: Chat instance
+        :return: Chat instance
         """
         pass
