@@ -38,6 +38,9 @@ jobs:
       - name: Run make
         run: make ci
 
+      - name: Build image
+        run: make image
+
     services:
       mongo:
         image: mongo:4.4.9
