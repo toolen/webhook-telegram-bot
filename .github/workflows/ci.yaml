@@ -42,6 +42,8 @@ jobs:
         run: make image
 
       - name: Push image
+        env:
+          CR_PAT: ${{ secrets.CR_PAT }}
         run: make push-to-ghcr
 
     services:
