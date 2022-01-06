@@ -1,6 +1,7 @@
 FROM python:3.9.9-slim-bullseye@sha256:615ceb9962b182726198d4e71c1b8ecfa4904f83957fb8f4742e573e18e990f7 AS builder
 
 LABEL maintainer="dmitrii@zakharov.cc"
+LABEL org.opencontainers.image.source="https://github.com/toolen/webhook-telegram-bot"
 
 ENV \
     DEBIAN_FRONTEND=noninteractive \
