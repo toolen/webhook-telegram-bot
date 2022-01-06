@@ -49,5 +49,8 @@ hadolint:
 	docker run --rm -i hadolint/hadolint:$(hadolint_version) < Dockerfile
 push:
 	docker trust sign $(tag)
+push-to-ghcr:
+	echo $CR_PAT | docker login ghcr.io -u toolen --password-stdin
+	docker push ghcr.io/toolen/$(tag)
 ngrok:
 	ngrok http --region=eu 8080

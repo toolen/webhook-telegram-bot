@@ -41,6 +41,9 @@ jobs:
       - name: Build image
         run: make image
 
+      - name: Push image
+        run: maker push-to-ghcr
+
     services:
       mongo:
         image: mongo:4.4.9
