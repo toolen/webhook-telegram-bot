@@ -41,6 +41,12 @@ jobs:
       - name: Build image
         run: make image
 
+      - name: Push image
+        if: ${{ github.ref_name == 'master' }}
+        env:
+          CR_PAT: ${{ secrets.CR_PAT }}
+        run: make push-to-ghcr
+
     services:
       mongo:
         image: mongo:4.4.9
