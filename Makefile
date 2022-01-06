@@ -1,7 +1,7 @@
 package_name = webhook_telegram_bot
 repository = toolen/webhook-telegram-bot
 version = $(shell poetry version -s)
-image_tag = ghcr.io/toolen/$(repository):$(version)
+image_tag = ghcr.io/$(repository):$(version)
 hadolint_version=2.8.0
 trivy_version=0.22.0
 
