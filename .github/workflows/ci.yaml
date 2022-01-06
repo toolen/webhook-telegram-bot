@@ -42,7 +42,7 @@ jobs:
         run: make image
 
       - name: Push image
-        run: maker push-to-ghcr
+        run: make push-to-ghcr
 
     services:
       mongo:
