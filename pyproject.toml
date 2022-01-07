@@ -12,7 +12,6 @@ Jinja2 = "3.0.3"
 first = "2.0.2"
 motor = "2.5.1"
 pydantic = "1.9.0"
-types-first = "^2.0.1"
 gunicorn = "^20.1.0"
 
 [tool.poetry.dev-dependencies]
@@ -29,6 +28,7 @@ radon = "5.1.0"
 Sphinx = "^4.3.2"
 sphinx-rtd-theme = "^1.0.0"
 sphinx-autoapi = "^1.8.4"
+types-first = "^2.0.1"
 
 [tool.black]
 skip-string-normalization = 1
