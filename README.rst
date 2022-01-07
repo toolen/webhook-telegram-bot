@@ -6,6 +6,52 @@ webhook-telegram-bot
 
 Telegram bot for handling webhooks.
 
+Usage
+==========
+
+1. Get token from `BotFather <https://core.telegram.org/bots#6-botfather>`_
+2. Setup `MongoDB <https://www.mongodb.com/>`_ or use `container <https://hub.docker.com/_/mongo>`_
+3. Run container::
+
+    docker run -d \
+    -p 8080:8080 \
+    --restart=always \
+    --cap-drop=ALL \
+    -e "TELEGRAM_API_TOKEN=<token from pt.1>" \
+    -e "TELEGRAM_WEBHOOK_HOST=<url where you can access the bot>" \
+    -e "DATABASE_URL=<connection string to MongoDB>" \
+    ghcr.io/toolen/webhook-telegram-bot:0.1.0
+
+Alternatively, you can use this docker-compose.yml::
+
+    version: "3"
+    services:
+      mongo:
+        image: mongo:4.4.9
+        container_name: mongo
+        restart: always
+      bot:
+        image: ghcr.io/toolen/webhook-telegram-bot:0.1.0
+        restart: always
+        ports:
+          - "8080:8080"
+        environment:
+          - "TELEGRAM_API_TOKEN=<token from pt.1>"
+          - "TELEGRAM_WEBHOOK_HOST=<url where you can access the bot>"
+          - "DATABASE_URL=mongodb://mongo:27017/db"
+        cap_drop:
+          - ALL
+
+Settings
+==========
+Bot can be configured via environment variables:
+
+* TELEGRAM_API_ENDPOINT (default: https://api.telegram.org) - useful if you use your own `Telegram Bot API <https://github.com/tdlib/telegram-bot-api>`_ server or proxy
+* TELEGRAM_API_TOKEN - token from `BotFather <https://core.telegram.org/bots#6-botfather>`_
+* TELEGRAM_WEBHOOK_HOST - url to receive incoming updates from Telegram API
+* DATABASE_URL - url to connect with database (e.g. mongodb://username:password@localhost:27017/db)
+* LOG_LEVEL (default: ERROR)
+
 Supported webhooks
 ======================
 

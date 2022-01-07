@@ -21,7 +21,7 @@ def get_config() -> Dict[str, Any]:
         'DATABASE_URL': env.get('DATABASE_URL', 'mongodb://localhost:27017/db'),
         'DATABASE_ENGINE': 'webhook_telegram_bot.database.backends.mongo',
         'TEMPLATES_DIR': os.path.join(os.path.dirname(__file__), 'templates'),
-        'LOG_LEVEL': env.get('LOG_LEVEL', 'DEBUG'),
+        'LOG_LEVEL': env.get('LOG_LEVEL', 'ERROR'),
         'PLUGINS': [
             'webhook_telegram_bot.plugins.bitbucket',
         ],
