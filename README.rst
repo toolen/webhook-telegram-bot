@@ -3,6 +3,9 @@ webhook-telegram-bot
 .. image:: https://github.com/toolen/webhook-telegram-bot/actions/workflows/ci.yaml/badge.svg?branch=master
     :target: https://github.com/toolen/webhook-telegram-bot/actions/workflows/ci.yaml
     :alt: CI Status
+.. image:: https://readthedocs.org/projects/webhook-telegram-bot/badge/?version=latest
+    :target: https://webhook-telegram-bot.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 Telegram bot for handling webhooks.
 
