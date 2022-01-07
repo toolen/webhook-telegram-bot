@@ -38,6 +38,11 @@ jobs:
       - name: Run make
         run: make ci
 
+      - name: Coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: poetry run coveralls --service=github
+
       - name: Build image
         run: make image
 
