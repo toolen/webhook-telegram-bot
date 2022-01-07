@@ -56,4 +56,4 @@ ngrok:
 	ngrok http --region=eu 8080
 tag:
 	git tag v$(version)
-	git push origin master
+	git push origin --tags
