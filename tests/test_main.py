@@ -44,7 +44,8 @@ def test_init_logging(caplog):
     log_level = default_config.get('LOG_LEVEL')
     caplog.set_level(log_level, logger='webhook_telegram_bot.main')
     init_logging(app)
-    assert f'Logging configured with {log_level} level.' in caplog.messages
+    if caplog.messages:
+        assert f'Logging configured with {log_level} level.' in caplog.messages
 
 
 async def test_unconfigured_database():
@@ -169,7 +170,8 @@ async def test_create_app(caplog, aiohttp_server, telegram_server_mock):
     server = await aiohttp_server(test_app)
 
     assert get_config(test_app) is not None
-    assert f'Logging configured with {log_level} level.' in caplog.messages
+    if caplog.messages:
+        assert f'Logging configured with {log_level} level.' in caplog.messages
     assert isinstance(get_database(test_app), DatabaseWrapperImpl)
     assert isinstance(get_template_engine(test_app), Environment)
     assert isinstance(get_telegram_api(test_app), TelegramAPI)
