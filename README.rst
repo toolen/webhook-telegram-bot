@@ -32,10 +32,6 @@ Alternatively, you can use this docker-compose.yml::
 
     version: "3"
     services:
-      mongo:
-        image: mongo:4.4.9
-        container_name: mongo
-        restart: always
       bot:
         image: ghcr.io/toolen/webhook-telegram-bot:1.0.0
         restart: always
@@ -47,6 +43,15 @@ Alternatively, you can use this docker-compose.yml::
           - "DATABASE_URL=mongodb://mongo:27017/db"
         cap_drop:
           - ALL
+      mongo:
+        image: mongo:4.4.9
+        container_name: mongo
+        hostname: mongo
+        restart: always
+        volumes:
+          - mongo_data:/data/db
+    volumes:
+      mongo_data:
 
 Settings
 ==========
