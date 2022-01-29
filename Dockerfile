@@ -68,4 +68,4 @@ RUN set -ex \
 
 WORKDIR /app/webhook_telegram_bot
 
-CMD [ "/sbin/tini", "--", "/app/venv/bin/python", "-m", "webhook_telegram_bot.main"]
+CMD [ "/sbin/tini", "--", "/app/venv/bin/python", "-m", "webhook_telegram_bot.main", "--host", "0.0.0.0", "--port", "8080"]

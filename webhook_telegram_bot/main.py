@@ -1,4 +1,5 @@
 """This file contains application methods."""
+import argparse
 import importlib
 import logging
 from typing import Dict, Optional, cast
@@ -28,6 +29,10 @@ from webhook_telegram_bot.telegram.routes import init_telegram_routes
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
 logger = logging.getLogger(__name__)
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--host', default="127.0.0.1")
+parser.add_argument('--port', default=8080)
 
 
 def init_config(
@@ -189,7 +194,8 @@ def main() -> None:
     :return: None
     """
     app = create_app()
-    web.run_app(app, host='0.0.0.0', port=8080)
+    args = parser.parse_args()
+    web.run_app(app, host=args.host, port=args.port)
 
 
 if __name__ == '__main__':
