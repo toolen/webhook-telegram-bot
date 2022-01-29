@@ -9,15 +9,14 @@ from webhook_telegram_bot.telegram.commands import Command
 from webhook_telegram_bot.telegram.commands.start import start_command_handler
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
-from .utils import get_db_mock, get_template_engine_mock
+from .utils import get_db_mock
 
 
-async def test_start_command_handler_return_add_webhook_button():
+async def test_start_command_handler_return_add_webhook_button(template_engine_mock):
     db = get_db_mock()
     telegram_api = TelegramAPI("", "")
-    template_engine = get_template_engine_mock()
 
-    resp = await start_command_handler(1, db, telegram_api, template_engine)
+    resp = await start_command_handler(1, db, telegram_api, template_engine_mock)
     assert resp is not None
     assert resp.status == 200
 
@@ -40,7 +39,7 @@ async def test_start_command_handler_return_add_webhook_button():
     assert button['callback_data'] == Command.ADD_WEBHOOK
 
 
-async def test_start_command_handler_return_edit_webhooks_button():
+async def test_start_command_handler_return_edit_webhooks_button(template_engine_mock):
     webhook_id = uuid4().hex
     chat = Chat(
         id=1,
@@ -49,9 +48,8 @@ async def test_start_command_handler_return_edit_webhooks_button():
     )
     db = get_db_mock(chat)
     telegram_api = TelegramAPI("", "")
-    template_engine = get_template_engine_mock()
 
-    resp = await start_command_handler(1, db, telegram_api, template_engine)
+    resp = await start_command_handler(1, db, telegram_api, template_engine_mock)
     assert resp is not None
     assert resp.status == 200
 

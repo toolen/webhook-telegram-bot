@@ -1,3 +1,6 @@
+from unittest.mock import Mock
+from uuid import uuid4
+
 import pytest
 from aiohttp import web
 from aiohttp.web_request import Request
@@ -47,3 +50,12 @@ async def db_wrapper(loop):
     yield db
     await db.drop_database()
     db.close()
+
+
+@pytest.fixture
+def template_engine_mock():
+    template = Mock()
+    template.render.return_value = uuid4().hex
+    template_engine = Mock()
+    template_engine.get_template.return_value = template
+    return template_engine

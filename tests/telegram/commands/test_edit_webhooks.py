@@ -9,10 +9,12 @@ from webhook_telegram_bot.telegram.commands.edit_webhooks import (
 )
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
-from .utils import get_db_mock, get_template_engine_mock
+from .utils import get_db_mock
 
 
-async def test_edit_webhooks_command_handler_return_list_of_webhooks():
+async def test_edit_webhooks_command_handler_return_list_of_webhooks(
+    template_engine_mock,
+):
     webhook_id = uuid4().hex
     webhook = Webhook(
         webhook_id=webhook_id, service='bitbucket', repository_name='Test'
@@ -25,9 +27,10 @@ async def test_edit_webhooks_command_handler_return_list_of_webhooks():
 
     db = get_db_mock(chat)
     telegram_api = TelegramAPI("", "")
-    template_engine = get_template_engine_mock()
 
-    resp = await edit_webhooks_command_handler(1, db, telegram_api, template_engine)
+    resp = await edit_webhooks_command_handler(
+        1, db, telegram_api, template_engine_mock
+    )
     assert resp is not None
     assert resp.status == 200
 
@@ -55,12 +58,15 @@ async def test_edit_webhooks_command_handler_return_list_of_webhooks():
     assert go_back_button['callback_data'] == Command.START
 
 
-async def test_edit_webhooks_command_handler_return_add_webhook_button_if_chat_not_found():
+async def test_edit_webhooks_command_handler_return_add_webhook_button_if_chat_not_found(
+    template_engine_mock,
+):
     db = get_db_mock()
     telegram_api = TelegramAPI("", "")
-    template_engine = get_template_engine_mock()
 
-    resp = await edit_webhooks_command_handler(1, db, telegram_api, template_engine)
+    resp = await edit_webhooks_command_handler(
+        1, db, telegram_api, template_engine_mock
+    )
     assert resp is not None
     assert resp.status == 200
 

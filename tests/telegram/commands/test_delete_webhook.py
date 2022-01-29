@@ -9,10 +9,12 @@ from webhook_telegram_bot.telegram.commands.delete_webhook import (
 )
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
-from .utils import get_db_mock, get_template_engine_mock
+from .utils import get_db_mock
 
 
-async def test_delete_webhook_command_handler_return_back_button_if_last_webhook_deleted():
+async def test_delete_webhook_command_handler_return_back_button_if_last_webhook_deleted(
+    template_engine_mock,
+):
     webhook_id = uuid4().hex
     webhook = Webhook(
         webhook_id=webhook_id, service='bitbucket', repository_name='Test'
@@ -25,10 +27,9 @@ async def test_delete_webhook_command_handler_return_back_button_if_last_webhook
 
     db = get_db_mock(chat)
     telegram_api = TelegramAPI("", "")
-    template_engine = get_template_engine_mock()
 
     resp = await delete_webhook_command_handler(
-        1, webhook_id, db, telegram_api, template_engine
+        1, webhook_id, db, telegram_api, template_engine_mock
     )
     assert resp is not None
     assert resp.status == 200
@@ -47,14 +48,15 @@ async def test_delete_webhook_command_handler_return_back_button_if_last_webhook
     assert go_back_button['callback_data'] == Command.START
 
 
-async def test_delete_webhook_command_handler_return_add_webhook_button_if_chat_not_found():
+async def test_delete_webhook_command_handler_return_add_webhook_button_if_chat_not_found(
+    template_engine_mock,
+):
     webhook_id = uuid4().hex
     db = get_db_mock()
     telegram_api = TelegramAPI("", "")
-    template_engine = get_template_engine_mock()
 
     resp = await delete_webhook_command_handler(
-        1, webhook_id, db, telegram_api, template_engine
+        1, webhook_id, db, telegram_api, template_engine_mock
     )
     assert resp is not None
     assert resp.status == 200

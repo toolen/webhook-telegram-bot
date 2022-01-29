@@ -8,19 +8,18 @@ from webhook_telegram_bot.telegram.commands.add_webhook import (
 )
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
-from .utils import get_template_engine_mock
 
-
-async def test_add_webhook_command_handler_return_list_services_from_plugins():
+async def test_add_webhook_command_handler_return_list_services_from_plugins(
+    template_engine_mock,
+):
     plugin_button_text = uuid4().hex
     plugin_button_command = uuid4().hex
     telegram_api = TelegramAPI("", "")
-    template_engine = get_template_engine_mock()
 
     resp = await add_webhook_command_handler(
         1,
         telegram_api,
-        template_engine,
+        template_engine_mock,
         [
             [
                 {

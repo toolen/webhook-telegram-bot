@@ -8,17 +8,14 @@ from webhook_telegram_bot.telegram.commands.edit_webhook import (
 )
 from webhook_telegram_bot.telegram.telegram_api import TelegramAPI
 
-from .utils import get_template_engine_mock
 
-
-async def test_edit_webhook_command_handler_return_delete_button():
+async def test_edit_webhook_command_handler_return_delete_button(template_engine_mock):
     webhook_id = uuid4().hex
 
     telegram_api = TelegramAPI("", "")
-    template_engine = get_template_engine_mock()
 
     resp = await edit_webhook_command_handler(
-        1, webhook_id, telegram_api, template_engine
+        1, webhook_id, telegram_api, template_engine_mock
     )
     assert resp is not None
     assert resp.status == 200
