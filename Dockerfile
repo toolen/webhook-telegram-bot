@@ -70,8 +70,8 @@ CMD [ "/sbin/tini", "--", \
 "/app/venv/bin/gunicorn", \
 "--worker-tmp-dir", "/dev/shm", \
 "--worker-class", "aiohttp.worker.GunicornWebWorker", \
-"--workers=2", \
-"--threads=4", \
+"--workers=1", \
+"--threads=1", \
 "--log-file=-", \
 "--chdir", "/app", \
 "--bind", "0.0.0.0:8080", \
