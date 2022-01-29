@@ -189,7 +189,7 @@ def main() -> None:
     :return: None
     """
     app = create_app()
-    web.run_app(app, host='localhost', port=8080)
+    web.run_app(app, host='0.0.0.0', port=8080)
 
 
 if __name__ == '__main__':

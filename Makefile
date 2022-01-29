@@ -44,7 +44,7 @@ image:
 size:
 	docker images | grep $(repository) | grep $(version)
 trivy:
-	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v ~/.cache/trivy:/root/.cache/ aquasec/trivy:$(trivy_version) --ignore-unfixed $(image_tag)
+	docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v ~/.cache/trivy:/root/.cache/ aquasec/trivy:$(trivy_version) image --ignore-unfixed $(image_tag)
 hadolint:
 	docker run --rm -i hadolint/hadolint:$(hadolint_version) < Dockerfile
 push:

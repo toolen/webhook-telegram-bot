@@ -26,7 +26,11 @@ WORKDIR /code
 
 COPY ./poetry.lock ./pyproject.toml /code/
 
-RUN poetry export --no-ansi --no-interaction > requirements.txt
+RUN poetry install --no-dev --no-ansi --no-interaction
+
+COPY ./webhook_telegram_bot /code/webhook_telegram_bot
+
+RUN poetry build --no-ansi --no-interaction
 
 FROM python:3.9.9-alpine3.15@sha256:ce36ba64436cc423fec8b27ac41875e36b0d977cc85594a4cab021ee3378a1c8 AS runner
 
@@ -45,16 +49,14 @@ ENV \
     # gunicorn
     GUNICORN_CMD_ARGS=""
 
-RUN apk add --no-cache \
-#        curl==7.80.0-r0 \
+RUN set -ex \
+    && apk add --no-cache \
+        expat==2.4.3-r0 \
         tini==0.19.0-r0 \
-    && cp /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime \
-    && echo "${TIME_ZONE}" > /etc/timezone \
-    && date \
     && addgroup -g 1000 -S app \
     && adduser -h /app -G app -S -u 1000 app
 
-COPY --chown=app:app --from=builder /code/requirements.txt /app
+COPY --chown=app:app --from=builder /code/dist/webhook_telegram_bot-*.whl /app
 
 WORKDIR /app
 
@@ -62,17 +64,8 @@ USER app
 
 RUN set -ex \
     && python -m venv venv \
-    && venv/bin/pip install --no-cache-dir --require-hashes -r requirements.txt
+    && venv/bin/pip install --no-cache-dir --target /app/webhook_telegram_bot -- webhook_telegram_bot-*.whl
 
-COPY ./webhook_telegram_bot /app/webhook_telegram_bot
+WORKDIR /app/webhook_telegram_bot
 
-CMD [ "/sbin/tini", "--", \
-"/app/venv/bin/gunicorn", \
-"--worker-tmp-dir", "/dev/shm", \
-"--worker-class", "aiohttp.worker.GunicornWebWorker", \
-"--workers=1", \
-"--threads=1", \
-"--log-file=-", \
-"--chdir", "/app", \
-"--bind", "0.0.0.0:8080", \
-"webhook_telegram_bot.main:create_app"]
+CMD [ "/sbin/tini", "--", "/app/venv/bin/python", "-m", "webhook_telegram_bot.main"]
