@@ -2,8 +2,10 @@
 import argparse
 import importlib
 import logging
+import ssl
 from typing import Dict, Optional, cast
 
+import certifi
 from aiohttp import web
 from jinja2 import Environment, PackageLoader, PrefixLoader, select_autoescape
 
@@ -33,6 +35,8 @@ logger = logging.getLogger(__name__)
 parser = argparse.ArgumentParser()
 parser.add_argument('--host', default="127.0.0.1")
 parser.add_argument('--port', default=8080)
+parser.add_argument('--ssl', dest='ssl', action='store_true')
+parser.set_defaults(ssl=False)
 
 
 def init_config(
@@ -195,7 +199,10 @@ def main() -> None:
     """
     app = create_app()
     args = parser.parse_args()
-    web.run_app(app, host=args.host, port=args.port)
+    ssl_context = (
+        ssl.create_default_context(cafile=certifi.where()) if args.ssl else None
+    )
+    web.run_app(app, host=args.host, port=args.port, ssl_context=ssl_context)
 
 
 if __name__ == '__main__':

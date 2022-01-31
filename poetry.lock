@@ -138,7 +138,7 @@ python2 = ["typed-ast (>=1.4.2)"]
 name = "certifi"
 version = "2021.10.8"
 description = "Python package for providing Mozilla's CA Bundle."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -924,7 +924,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "0ec1972c638f29b7dad274ff404a16f19fff06d2e3387b0406a6283e965a7851"
+content-hash = "413038f031943b3609e1d6bc2f2f4a239741edca502c3cf989ae5caf79a24e0f"
 
 [metadata.files]
 aiohttp = [
