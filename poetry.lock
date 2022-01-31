@@ -865,6 +865,14 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "types-certifi"
+version = "2021.10.8.1"
+description = "Typing stubs for certifi"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "types-first"
 version = "2.0.1"
 description = "Typing stubs for first"
@@ -924,7 +932,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "413038f031943b3609e1d6bc2f2f4a239741edca502c3cf989ae5caf79a24e0f"
+content-hash = "9fcf0f2a74cc547d195165e0855d8429e31296a7a0014c8ca3c456e836616271"
 
 [metadata.files]
 aiohttp = [
@@ -1776,6 +1784,10 @@ toml = [
 tomli = [
     {file = "tomli-2.0.0-py3-none-any.whl", hash = "sha256:b5bde28da1fed24b9bd1d4d2b8cba62300bfb4ec9a6187a957e8ddb9434c5224"},
     {file = "tomli-2.0.0.tar.gz", hash = "sha256:c292c34f58502a1eb2bbb9f5bbc9a5ebc37bee10ffb8c2d6bbdfa8eb13cc14e1"},
+]
+types-certifi = [
+    {file = "types-certifi-2021.10.8.1.tar.gz", hash = "sha256:546cd3ca4466855959fbc8868fd7139a50eb55a2d1fae497e13b60af439597a3"},
+    {file = "types_certifi-2021.10.8.1-py3-none-any.whl", hash = "sha256:2290008f32e6ac7c69e779d04fa1bc4c6bb4c7200aa3b3b072ad5475a8968aa5"},
 ]
 types-first = [
     {file = "types-first-2.0.1.tar.gz", hash = "sha256:460464227eb60a7bded9c9b7b1767bfc077aad96b897125eac358e83e55df733"},
