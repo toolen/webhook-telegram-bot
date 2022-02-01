@@ -2,10 +2,9 @@
 import argparse
 import importlib
 import logging
-import ssl
+import sys
 from typing import Dict, Optional, cast
 
-import certifi
 from aiohttp import web
 from jinja2 import Environment, PackageLoader, PrefixLoader, select_autoescape
 
@@ -35,8 +34,6 @@ logger = logging.getLogger(__name__)
 parser = argparse.ArgumentParser()
 parser.add_argument('--host', default="127.0.0.1")
 parser.add_argument('--port', default=8080)
-parser.add_argument('--ssl', dest='ssl', action='store_true')
-parser.set_defaults(ssl=False)
 
 
 def init_config(
@@ -63,7 +60,11 @@ def init_logging(app: web.Application) -> None:
     :return: None
     """
     log_level = cast(str, get_config_value(app, 'LOG_LEVEL'))
-    logging.basicConfig(level=log_level)
+    logging.basicConfig(
+        level=log_level,
+        format="[%(levelname)s %(asctime)s %(name)s] %(message)s",
+        stream=sys.stdout,
+    )
     logger.debug(f'Logging configured with {log_level} level.')
 
 
@@ -199,10 +200,9 @@ def main() -> None:
     """
     app = create_app()
     args = parser.parse_args()
-    ssl_context = (
-        ssl.create_default_context(cafile=certifi.where()) if args.ssl else None
-    )
-    web.run_app(app, host=args.host, port=args.port, ssl_context=ssl_context)
+    # ssl_context = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+    # ssl_context.load_cert_chain('domain.crt', 'domain.key')
+    web.run_app(app, host=args.host, port=args.port)
 
 
 if __name__ == '__main__':
