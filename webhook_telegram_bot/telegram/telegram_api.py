@@ -44,7 +44,7 @@ class TelegramAPI:
             async with session.post(url, json=payload, headers=headers) as response:
                 data = await response.json()
                 logger.debug(f'Telegram response: {json.dumps(data)}')
-                return data
+                return cast(Dict[str, Any], data)
 
     async def set_webhook(self, url_webhook: str) -> None:
         """

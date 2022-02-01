@@ -26,7 +26,7 @@ lint:
 	poetry run safety check
 	make radon
 mypy:
-	poetry run mypy --strict --no-warn-return-any $(package_name)
+	poetry run mypy $(package_name)
 pydocstyle:
 	poetry run pydocstyle --add-ignore=D104 $(package_name)/
 test:

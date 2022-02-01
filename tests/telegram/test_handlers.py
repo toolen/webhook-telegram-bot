@@ -25,7 +25,9 @@ def get_request_with_payload(app, payload):
     return request
 
 
-async def test_telegram_request_handler_write_log_message_if_no_text(loop, app, caplog):
+async def test_telegram_request_handler_write_log_message_if_no_text(
+    event_loop, app, caplog
+):
     get_request_with_payload(app, {'message': {'chat': {'id': 1}}})
     if caplog.messages:
         assert (
@@ -35,7 +37,7 @@ async def test_telegram_request_handler_write_log_message_if_no_text(loop, app, 
 
 
 async def test_telegram_request_handler_write_log_message_if_no_chat_id(
-    loop, app, caplog
+    event_loop, app, caplog
 ):
     get_request_with_payload(app, {'message': {'text': 'test'}})
     if caplog.messages:
@@ -45,7 +47,9 @@ async def test_telegram_request_handler_write_log_message_if_no_chat_id(
         )
 
 
-async def test_telegram_request_handler_return_empty_resp_if_command_unknown(loop, app):
+async def test_telegram_request_handler_return_empty_resp_if_command_unknown(
+    event_loop, app
+):
     request = get_request_with_payload(
         app, {'message': {'chat': {'id': 1}, 'text': uuid4().hex}}
     )
@@ -55,7 +59,7 @@ async def test_telegram_request_handler_return_empty_resp_if_command_unknown(loo
     assert resp.body is None
 
 
-async def test_telegram_request_handler_command_start(loop, app):
+async def test_telegram_request_handler_command_start(event_loop, app):
     request = get_request_with_payload(
         app, {'message': {'chat': {'id': 1}, 'text': Command.START}}
     )
@@ -65,7 +69,7 @@ async def test_telegram_request_handler_command_start(loop, app):
     assert resp.body is not None
 
 
-async def test_telegram_request_handler_command_add_webhook(loop, app):
+async def test_telegram_request_handler_command_add_webhook(event_loop, app):
     request = get_request_with_payload(
         app, {'message': {'chat': {'id': 1}, 'text': Command.ADD_WEBHOOK}}
     )
@@ -75,7 +79,7 @@ async def test_telegram_request_handler_command_add_webhook(loop, app):
     assert resp.body is not None
 
 
-async def test_telegram_request_handler_command_edit_webhooks(loop, app):
+async def test_telegram_request_handler_command_edit_webhooks(event_loop, app):
     request = get_request_with_payload(
         app, {'message': {'chat': {'id': 1}, 'text': Command.EDIT_WEBHOOKS}}
     )
@@ -85,7 +89,7 @@ async def test_telegram_request_handler_command_edit_webhooks(loop, app):
     assert resp.body is not None
 
 
-async def test_telegram_request_handler_command_edit_webhook(loop, app):
+async def test_telegram_request_handler_command_edit_webhook(event_loop, app):
     request = get_request_with_payload(
         app, {'message': {'chat': {'id': 1}, 'text': Command.EDIT_WEBHOOK}}
     )
@@ -95,7 +99,7 @@ async def test_telegram_request_handler_command_edit_webhook(loop, app):
     assert resp.body is not None
 
 
-async def test_telegram_request_handler_command_delete_webhook(loop, app):
+async def test_telegram_request_handler_command_delete_webhook(event_loop, app):
     request = get_request_with_payload(
         app, {'message': {'chat': {'id': 1}, 'text': Command.DELETE_WEBHOOK}}
     )
@@ -105,7 +109,7 @@ async def test_telegram_request_handler_command_delete_webhook(loop, app):
     assert resp.body is not None
 
 
-async def test_get_response_from_plugins(loop, app):
+async def test_get_response_from_plugins(event_loop, app):
     async def handle_telegram_command(app_, chat_id, command):
         return web.json_response({"foo": "bar"})
 

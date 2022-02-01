@@ -44,7 +44,7 @@ async def telegram_server_mock(aiohttp_server):
 
 
 @pytest.fixture
-async def db_wrapper(loop):
+async def db_wrapper(event_loop):
     config = get_config()
     db = get_db_wrapper_instance(config['DATABASE_ENGINE'], config['DATABASE_URL'])
     yield db
