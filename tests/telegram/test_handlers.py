@@ -1,11 +1,9 @@
 from unittest.mock import Mock
 from uuid import uuid4
 
-import pytest
 from aiohttp import web
 from aiohttp.test_utils import make_mocked_request
 
-from webhook_telegram_bot.exceptions import WebhookBotException
 from webhook_telegram_bot.helpers import set_plugins_instances, set_telegram_api
 from webhook_telegram_bot.telegram.commands import Command
 from webhook_telegram_bot.telegram.constants import TELEGRAM_WEBHOOK_ROUTE
@@ -27,16 +25,24 @@ def get_request_with_payload(app, payload):
     return request
 
 
-async def test_telegram_request_handler_raise_exception_if_no_text(loop, app):
-    request = get_request_with_payload(app, {'message': {'chat': {'id': 1}}})
-    with pytest.raises(WebhookBotException):
-        await telegram_request_handler(request)
+async def test_telegram_request_handler_write_log_message_if_no_text(loop, app, caplog):
+    get_request_with_payload(app, {'message': {'chat': {'id': 1}}})
+    if caplog.messages:
+        assert (
+            'The message from Telegram does not contain the "text" fields.'
+            in caplog.messages
+        )
 
 
-async def test_telegram_request_handler_raise_exception_if_no_chat_id(loop, app):
-    request = get_request_with_payload(app, {'message': {'text': 'test'}})
-    with pytest.raises(WebhookBotException):
-        await telegram_request_handler(request)
+async def test_telegram_request_handler_write_log_message_if_no_chat_id(
+    loop, app, caplog
+):
+    get_request_with_payload(app, {'message': {'text': 'test'}})
+    if caplog.messages:
+        assert (
+            'The message from Telegram does not contain the "chat_id" fields.'
+            in caplog.messages
+        )
 
 
 async def test_telegram_request_handler_return_empty_resp_if_command_unknown(loop, app):

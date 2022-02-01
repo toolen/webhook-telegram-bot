@@ -6,7 +6,6 @@ from typing import Optional
 from aiohttp import web
 from aiohttp.web_request import Request
 
-from webhook_telegram_bot.exceptions import WebhookBotException
 from webhook_telegram_bot.helpers import (
     get_database,
     get_plugins_instances,
@@ -51,8 +50,13 @@ async def telegram_request_handler(request: Request) -> web.Response:
     text: Optional[str] = telegram_api.get_text(data)
     chat_id: Optional[int] = telegram_api.get_chat_id(data)
 
-    if not text or not chat_id:
-        raise WebhookBotException()
+    if not text:
+        logger.info('The message from Telegram does not contain the "text" fields.')
+        return web.Response()
+
+    if not chat_id:
+        logger.info('The message from Telegram does not contain the "chat_id" fields.')
+        return web.Response()
 
     if text == Command.START:
         return await start_command_handler(chat_id, db, telegram_api, template_engine)
