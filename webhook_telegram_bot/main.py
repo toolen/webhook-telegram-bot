@@ -13,6 +13,7 @@ from webhook_telegram_bot.exceptions import (
     ImproperlyConfiguredException,
     WebhookBotException,
 )
+from webhook_telegram_bot.handlers import health_handler
 from webhook_telegram_bot.helpers import (
     get_config_value,
     get_database,
@@ -175,6 +176,16 @@ def init_telegram(app: web.Application) -> None:
     init_telegram_routes(app)
 
 
+def init_routes(app: web.Application) -> None:
+    """
+    Initialize common application routes.
+
+    :param app: application instance
+    :return:
+    """
+    app.router.add_route("GET", "/api/v1/health", health_handler, name="health")
+
+
 async def create_app(config: Optional[Dict[str, str]] = None) -> web.Application:
     """
     Create application.
@@ -189,6 +200,7 @@ async def create_app(config: Optional[Dict[str, str]] = None) -> web.Application
     init_plugins(app)
     init_templates(app)
     init_telegram(app)
+    init_routes(app)
     return app
 
 

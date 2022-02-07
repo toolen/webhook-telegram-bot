@@ -62,6 +62,10 @@ RUN set -ex \
 
 COPY --chown=app:app ./webhook_telegram_bot /app/webhook_telegram_bot
 
+COPY --chown=app:app ./healthcheck.py /app
+
 EXPOSE 8080
+
+HEALTHCHECK --interval=10s --timeout=10s --retries=3 CMD /app/venv/bin/python healthcheck.py || exit 1
 
 CMD [ "/sbin/tini", "--", "/app/venv/bin/python", "-m", "webhook_telegram_bot.main", "--host", "0.0.0.0", "--port", "8080"]

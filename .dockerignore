@@ -3,5 +3,6 @@
 
 # Allow files and directories
 !/webhook_telegram_bot
+!/healthcheck.py
 !/poetry.lock
 !/pyproject.toml
