@@ -33,7 +33,7 @@ Alternatively, you can use this docker-compose.yml::
     version: "3"
     services:
       bot:
-        image: ghcr.io/toolen/webhook-telegram-bot:1.0.0
+        image: ghcr.io/toolen/webhook-telegram-bot:1.1.0
         restart: always
         ports:
           - "8080:8080"
