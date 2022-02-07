@@ -57,3 +57,7 @@ ngrok:
 tag:
 	git tag v$(version)
 	git push origin --tags
+.PHONY: docs
+docs:
+	make -C docs html
+	python -m http.server 8000 --bind 127.0.0.1 --directory docs/build/html
