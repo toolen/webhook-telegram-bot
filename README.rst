@@ -26,14 +26,14 @@ Usage
     -e "TELEGRAM_API_TOKEN=<token from pt.1>" \
     -e "TELEGRAM_WEBHOOK_HOST=<url where you can access the bot>" \
     -e "DATABASE_URL=<connection string to MongoDB>" \
-    ghcr.io/toolen/webhook-telegram-bot:1.1.0
+    ghcr.io/toolen/webhook-telegram-bot:1.2.0
 
 Alternatively, you can use this docker-compose.yml::
 
     version: "3"
     services:
       bot:
-        image: ghcr.io/toolen/webhook-telegram-bot:1.1.0
+        image: ghcr.io/toolen/webhook-telegram-bot:1.2.0
         restart: always
         ports:
           - "8080:8080"

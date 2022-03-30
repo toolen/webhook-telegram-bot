@@ -60,12 +60,15 @@ RUN set -ex \
     && python -m venv venv \
     && venv/bin/pip install --no-cache-dir --require-hashes -r requirements.txt
 
-COPY --chown=app:app ./webhook_telegram_bot /app/webhook_telegram_bot
+COPY --chown=app:app ./healthcheck.py ./gunicorn.conf.py /app/
 
-COPY --chown=app:app ./healthcheck.py /app
+COPY --chown=app:app ./webhook_telegram_bot /app/webhook_telegram_bot
 
 EXPOSE 8080
 
 HEALTHCHECK --interval=10s --timeout=10s --retries=3 CMD /app/venv/bin/python healthcheck.py || exit 1
 
-CMD [ "/sbin/tini", "--", "/app/venv/bin/python", "-m", "webhook_telegram_bot.main", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["/sbin/tini", "--", \
+"/app/venv/bin/gunicorn", \
+"--config", "/app/gunicorn.conf.py", \
+"webhook_telegram_bot.main:create_app"]

@@ -3,6 +3,7 @@
 
 # Allow files and directories
 !/webhook_telegram_bot
+!/gunicorn.conf.py
 !/healthcheck.py
 !/poetry.lock
 !/pyproject.toml

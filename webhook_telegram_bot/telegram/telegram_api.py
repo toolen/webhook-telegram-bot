@@ -1,6 +1,8 @@
 """This file contains TelegramAPI class."""
 import json
 import logging
+import time
+from multiprocessing import Lock
 from typing import Any, Dict, List, Optional, Union, cast
 
 import aiohttp
@@ -9,6 +11,7 @@ from aiohttp import web
 from webhook_telegram_bot.utils import deep_get
 
 logger = logging.getLogger(__name__)
+lock = Lock()
 
 
 class TelegramAPI:
@@ -38,13 +41,20 @@ class TelegramAPI:
         :param payload: payload of command
         :return: response data of Telegram server
         """
-        headers = {'Content-Type': 'application/json'}
-        async with aiohttp.ClientSession() as session:
-            url = f'{self.telegram_api_endpoint}/bot{self.token}/{command}'
-            async with session.post(url, json=payload, headers=headers) as response:
-                data = await response.json()
-                logger.debug(f'Telegram response: {json.dumps(data)}')
-                return cast(Dict[str, Any], data)
+        lock.acquire()
+        try:
+            headers = {'Content-Type': 'application/json'}
+            async with aiohttp.ClientSession() as session:
+                url = f'{self.telegram_api_endpoint}/bot{self.token}/{command}'
+                async with session.post(url, json=payload, headers=headers) as response:
+                    data = await response.json()
+                    logger.debug(f'Telegram response: {json.dumps(data)}')
+                    return cast(Dict[str, Any], data)
+        finally:
+            # Avoid too many requests in multithreading environment.
+            # https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
+            time.sleep(0.8)
+            lock.release()
 
     async def set_webhook(self, url_webhook: str) -> None:
         """
