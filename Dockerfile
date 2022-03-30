@@ -1,4 +1,4 @@
-FROM python:3.10.2-slim-bullseye@sha256:e8c51ac54aa716f465eb7293130535307fcfae9b864e433ca60d843561c86ef6 AS builder
+FROM python:3.10.4-slim-bullseye@sha256:3c736db4c8146beb8d04bcb682fd5aec5011d9ff6468f093d4b7e8d2ba8726c7 AS builder
 
 LABEL maintainer="dmitrii@zakharov.cc"
 LABEL org.opencontainers.image.source="https://github.com/toolen/webhook-telegram-bot"
@@ -28,7 +28,7 @@ COPY ./poetry.lock ./pyproject.toml /code/
 
 RUN poetry export --no-ansi --no-interaction --output requirements.txt
 
-FROM python:3.10.2-alpine3.15@sha256:60469fac3d4c1c4781465b18f1a89d8dd2a01af9bb799d17836b972fcc463da9 AS runner
+FROM python:3.10.4-alpine3.15@sha256:bd9f7fd93baf921d34f30f585d41081e8a105875ef7de767910659a5f12472e3 AS runner
 
 LABEL maintainer="dmitrii@zakharov.cc"
 LABEL org.opencontainers.image.source="https://github.com/toolen/webhook-telegram-bot"
